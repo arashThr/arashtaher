@@ -4,7 +4,9 @@ menu = "main"
 weight = 10
 +++
 
-i like making stff and building things. let me know if i can help you, or if you're interested in joining me.
+i like making stuff and building things. let me know if i can help you, or if you're interested in joining me.
+
+working on pensive now :loading
 
 ---
 
@@ -20,9 +22,7 @@ previous projects:
 - [atomic wars series](https://soundcloud.com/atomicwarseries): i helped with selling it
 
 
+{{< newsletter >}}
+
+
 ![](/images/daal.jpg)
-
----
-
-working on pensive now :loading
-
