@@ -8,9 +8,11 @@ i like making stuff and building things. let me know if i can help you, or if yo
 
 working on pensive now :loading
 
----
+send me your email so i let you know when it's ready:
 
-previous projects:
+{{< newsletter >}}
+
+## previous projects
 
 ### tech
 - [partalk](https://github.com/arashThr/partalk/): measured sessions between customers and consultants
@@ -21,8 +23,6 @@ previous projects:
 - [pr podcast](https://arashthr.github.io/prpodcast-website/): open source stories
 - [atomic wars series](https://soundcloud.com/atomicwarseries): i helped with selling it
 
-
-{{< newsletter >}}
 
 
 ![](/images/daal.jpg)
