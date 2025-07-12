@@ -1,0 +1,28 @@
++++
+title = "projects"
+menu = "main"
+weight = 10
++++
+
+i like making stff and building things. let me know if i can help you, or if you're interested in joining me.
+
+---
+
+previous projects:
+
+### tech
+- [partalk](https://github.com/arashThr/partalk/): measured sessions between customers and consultants
+- [rikhtaar](http://rikhtaar.ir/): conceret scupltures
+
+### podcasting
+- [radio daal podcast](https://radiodaal.ir/): diaspora stories
+- [pr podcast](https://arashthr.github.io/prpodcast-website/): open source stories
+- [atomic wars series](https://soundcloud.com/atomicwarseries): i helped with selling it
+
+
+![](/images/daal.jpg)
+
+---
+
+working on pensive now :loading
+
