@@ -14,6 +14,8 @@ Worked on the development of Volvo’s new test drive platform, one of the key l
 
 **Tech stack:** Go, Node.js, React, GraphQL, GitHub Actions, ArgoCD, PostgreSQL, Garafana, Azure
 
+---
+
 ### Klarna Bank AB — Software Engineer, Native Banking Network Team  
 *Stockholm, Sweden — 05/2022–05/2024*  
 Klarna is a leading provider of online financial services, offering solutions for online payments and post-purchase financing.  
@@ -24,6 +26,8 @@ Klarna is a leading provider of online financial services, offering solutions fo
 **Tech stack:** Java, Typescript, Node.js, AWS (RDS, SQS, EventBridge), Jenkins, Terraform, Kafka
 
 ---
+
+<div class="page-break"></div>
 
 ### Deriv Services Sdn Bhd — Backend Developer, Data Feed Team  
 *Cyberjaya, Malaysia — 02/2020–05/2022*  

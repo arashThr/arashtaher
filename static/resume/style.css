@@ -93,5 +93,7 @@ a {
   }
 
   ul li { margin-bottom: 0.3em; }
+
+  .page-break { break-after: page; }
 }
 
