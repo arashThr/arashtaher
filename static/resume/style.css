@@ -1,0 +1,97 @@
+
+@import url('https://fonts.googleapis.com/css2?family=Libre+Baskerville:wght@400;700&display=swap');
+
+body {
+  font-family: 'Libre Baskerville', serif;
+  margin: 4rem auto;
+  max-width: 850px;
+  color: #000;
+  background: #fff;
+  line-height: 1.8;
+  padding: 0 1.5rem;
+}
+
+.header {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: center;
+  border-bottom: 2px solid #000;
+  padding-bottom: 1rem;
+  margin-bottom: 2rem;
+}
+
+.header h1 {
+  flex: 1 1 60%;
+  font-weight: 700;
+  font-size: 2em;
+  margin: 0;
+}
+
+.header .contact-info {
+  flex: 1 1 40%;
+  text-align: right;
+  font-size: 0.9em;
+}
+
+.contact-info a {
+  font-size: 0.85em;
+  margin-left: 0.2em;
+}
+
+section {
+  margin-bottom: 3rem;
+  border-bottom: 1px solid #000;
+  padding-bottom: 2rem;
+}
+
+section:last-of-type {
+  border-bottom: none;
+  padding-bottom: 0;
+  margin-bottom: 0;
+}
+
+h2 {
+  color: #000;
+  font-weight: 700;
+  font-size: 1.25em;
+  border-bottom: 1px solid #000;
+  padding-bottom: 0.4em;
+  margin-bottom: 1.2rem;
+}
+
+h3 {
+  margin-bottom: 0.2em;
+  color: #000;
+  font-weight: 700;
+  font-size: 1.1em;
+}
+
+a {
+  color: #000;
+  text-decoration: underline;
+}
+
+@media print {
+  @page {
+    margin: 1in;
+    font-size: 8pt;
+    color: lightgray;
+    font-family: 'Libre Baskerville', serif;
+    @bottom-center {
+      content: counter(page) "/" counter(pages);
+    }
+    @bottom-right {
+      content: "Aug 2025";
+    }
+  }
+
+  body {
+    font-size: 0.9em;
+    font-family: 'Libre Baskerville', serif;
+    line-height: 1.6;
+  }
+
+  ul li { margin-bottom: 0.3em; }
+}
+
