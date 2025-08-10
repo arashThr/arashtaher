@@ -6,6 +6,8 @@ description = "I have lunched a bookmarking application called Pensive. In this 
 tags = ["project","bookmarking","llm","ai"]
 +++
 
+Summary: I built [Pensive](https://getpensive.com) as a tool to preserve and search my online discoveries. It integrates with Telegram and has a browser extension for easy saving. It uses Go, HTMX, PostgreSQL, and Gemini Flash for AI features.
+
 A few years ago, I stumbled upon Microsoft's [MyLifeBits](https://en.wikipedia.org/wiki/MyLifeBits) research project. The idea was simple yet profound: document everything in your life and make it searchable. Gordon Bell, the test subject, had his entire life indexed - every document, photo, and interaction.
 
 That concept haunted me. Not because I wanted to record everything, but because I realized how much valuable knowledge I was losing online.
