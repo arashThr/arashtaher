@@ -2,7 +2,7 @@
 title = "Introducing Pensive: Building a Searchable Memory for the Web"
 date = "2025-08-10T11:06:52+02:00"
 description = "I have launched a bookmarking application called Pensive. In this post I tell the story of why I decided to build this application, where you can find it, and I also share some of the technical decisions I made along the way"
-
+slug = "introducing pensive"
 tags = ["project","bookmarking","llm","ai"]
 +++
 
