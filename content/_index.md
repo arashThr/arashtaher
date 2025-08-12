@@ -14,10 +14,6 @@ I like making stuff and building things. Let me know if you have a problem that 
 
 Working on [Pensive](https://getpensive.com) now :loading
 
-Send me your email so i let you know when it's ready:
-
-{{< newsletter >}}
-
 ## previous projects
 
 ### tech
@@ -30,3 +26,5 @@ Send me your email so i let you know when it's ready:
 - [Atomic Wars Series](https://soundcloud.com/atomicwarseries): premium podcast series from StringCast
 
 ![](/images/daal.jpg)
+
+{{< newsletter >}}
