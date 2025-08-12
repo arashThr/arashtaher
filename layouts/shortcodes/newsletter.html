@@ -77,7 +77,7 @@
     </div>
     <div></div>
     <div id="sib-container" class="sib-container--large sib-container--vertical" style="text-align:center; background-color:rgba(255,255,255,1); max-width:540px; border-radius:3px; border-width:0px; border-color:#C0CCD9; border-style:solid; direction:ltr">
-      <form id="sib-form" method="POST" action="https://7c1bfe29.sibforms.com/serve/MUIFAG55KiqeWHkhIf1aZK5FRMjKRaUHjQ_j14HvKceVx1G0j7EjW9XZh7S-ZI4LuzQvOzwn_EKMWPOzfTSKjzg9yswiWZ8FNNPrXXPnnxcOmEcLBZFdXCZOs1AdIq6evb_2U4H9CmRXvEUz22zXZz_SUXTrEMlXUaTI1MYg7JbR01fFHwBFtUZJ3tYlThkh6w7fMHytbOMl7YvP" data-type="subscription">
+      <form id="sib-form" method="POST" action="https://7c1bfe29.sibforms.com/serve/MUIFAB9XZBiLRq_8sR_outjKj2QxG8OzbhOfRpGsKJJopnTlezNpZgfRR4CnvTDK31bKj6hWbeLK-fHBnRGM_vW83ETbnaxjdn409wW-gaT5lxj0_1NolX6zKkXgB8rRJBR4O5Avkld-C_aqNnaTdXW9zzaOJdzVvSlbQQXtruWINHwaBF5Iwai5xIfW6vuPybGVJR1Si1dQwuHG" data-type="subscription">
         <div style="padding: 8px 0;">
           <div class="sib-input sib-form-block">
             <div class="form__entry entry_block">
@@ -102,9 +102,10 @@
                   function handleCaptchaResponse() {
                     var event = new Event('captchaChange');
                     document.getElementById('sib-captcha').dispatchEvent(event);
+                    window.grecaptcha = window.turnstile;
                   }
                 </script>
-                <div class="g-recaptcha sib-visible-recaptcha" id="sib-captcha" data-sitekey="0x4AAAAAABq9VC45HHYat6Mp" data-callback="handleCaptchaResponse" style="direction:ltr"></div>
+                <div class="cf-turnstile g-recaptcha" data-sitekey="0x4AAAAAABq9VC45HHYat6Mp" id="sib-captcha" data-callback="handleCaptchaResponse" data-language="en"></div>
               </div>
               <label class="entry__error entry__error--primary" style="font-size:16px; text-align:left; font-family:Helvetica, sans-serif; color:#661d1d; background-color:#ffeded; border-radius:3px; border-color:#ff4949;">
               </label>
@@ -157,7 +158,7 @@
 
 <script defer src="https://sibforms.com/forms/end-form/build/main.js"></script>
 
-<script src="https://www.google.com/recaptcha/api.js?hl=en"></script>
+<script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
 
 <!-- END - We recommend to place the above code in footer or bottom of your website html  -->
 <!-- End Brevo Form -->
