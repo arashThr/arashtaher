@@ -10,7 +10,7 @@ I write about tech in [my blog](/blog), and about more personal stuff in my [far
 
 ---
 
-I like making stuff and building things. Let me know if you have a problem that I can help you tackle, or if you're interested in joining me in solving one. Here's [my resume](/resume/arashtaher.html) for the crawling bots.
+I like making stuff and building things. Let me know if you have a problem that I can help you tackle, or if you're interested in joining me in solving one. Here's [my resume](/resume/) for the crawling bots.
 
 Working on [Pensive](https://getpensive.com) now :loading
 

@@ -63,10 +63,10 @@ Rayvarz is a leading Iranian software company focused on ERP and MIS systems.
 
 ## Personal Projects
 
-- **[Pensive](https://getpensive.com/)** - A bookmarking solution to help building your own searchable memory of the web
+- **[Pensive](https://getpensive.com/)** — A bookmarking solution to help building your own searchable memory of the web
 - **GPGPU Programming Research** — Conducted research using PyOpenCL to enhance parallel processing on GPUs through hybrid techniques
-- **[Radio Daal Podcast](https://radiodaal.ir/)** - Long form conversation with diasporas (In Persian)
-- **[Rikhtar](https://rikhtaar.ir/)** - 3D printed concrete sculptures
+- **[Radio Daal Podcast](https://radiodaal.ir/)** — Long form conversation with diasporas (In Persian)
+- **[Rikhtar](https://rikhtaar.ir/)** — 3D printed concrete sculptures
 
 ## Education
 

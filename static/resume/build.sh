@@ -8,6 +8,6 @@ pandoc resume.md \
   --to html5 \
   --template=template.html \
   --css=style.css \
-  -s -o arashtaher.html
+  -s -o index.html
 
-echo "✅ Resume generated: resume.html — open in browser to print to PDF"
+echo "✅ Resume generated: index.html — open in browser to print to PDF"
