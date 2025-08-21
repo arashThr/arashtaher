@@ -266,5 +266,7 @@ And by passing a file name that does not exist, I get this output:
 
 In this post, I explored different techniques for error handling in Go. I started with basic sentinel errors and gradually moved towards custom error types that add more context. I also demonstrated how to structure errors for client-facing applications using `AppError`. While these techniques cover various aspects of Go error handling, I'm eager to hear your thoughts and suggestions for improvement.
 
+**Update (August 2025)**: I've written a follow-up post about [Better Error Handling in Go]({{< ref "better-error-handling-in-go.md" >}}) that addresses some issues with the `AppError` approach and provides an improved solution.
+
 *Edits:  
 8 Sep: Updated the error messages after [this comment](https://www.reddit.com/r/golang/comments/1fbc7c0/comment/lm1vr7t/) on Reddit to remove all the "failure" repetitions*
