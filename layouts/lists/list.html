@@ -1,0 +1,26 @@
+{{ define "main" }}
+<content>
+  {{ if .Content }}
+  <div class="list-description">
+    {{ .Content }}
+  </div>
+  {{ end }}
+  {{ if .Data.Singular }}
+  <h3 style="margin-bottom:0">Filtering for "{{ .Title }}"</h3>
+  <small>
+    <a href="{{ "lists" | relURL }}">Remove filter</a>
+  </small>
+  {{ end }}
+  <ul class="simple-list">
+    {{ range .Pages }}
+    <li>
+      <a href="{{ .Permalink }}">{{ .Title }}</a>
+    </li>
+    {{ else }}
+    <li>
+      No lists yet
+    </li>
+    {{ end }}
+  </ul>
+</content>
+{{ end }}

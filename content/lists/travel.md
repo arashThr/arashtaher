@@ -1,9 +1,10 @@
 +++
-title = "Travel list"
+title = "Travels"
 date = "2025-07-27T13:08:48+02:00"
 description = "My list of essentials for traveling to different countries"
-tags = ["travel", "apps"]
 +++
+
+Collection of travel essentials and apps I find useful when traveling to different countries.
 
 ## Denmark
 
