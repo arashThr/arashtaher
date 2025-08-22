@@ -4,8 +4,9 @@ title = "Arash Taher"
 author = "Arash Taher"
 enableRobotsTXT = true
 
-disableKinds = ["taxonomy"]
-ignoreErrors = ["error-disable-taxonomy"]
+# Enable taxonomies for tags
+[taxonomies]
+  tag = "tags"
 [permalinks]
   blog = "/blog/:slug/"
   tags = "/tags/:slug"

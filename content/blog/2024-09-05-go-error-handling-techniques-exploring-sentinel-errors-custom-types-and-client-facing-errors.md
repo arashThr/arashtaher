@@ -4,7 +4,8 @@ tags:
 - go
 - error handling
 - programming
-title: 'Go Error Handling Techniques: Exploring Sentinel Errors, Custom Types, and Client-Facing Errors'
+title: 'Exploring Sentinel, Custom and Client-Facing Errors in Go'
+slug: 'Go sentinel and custom errors'
 ---
 
 In this blog post, I share my experiments with error handling in Go. I'm new to Go, and there's a lot to learn, but one important aspect is proper error handling: I wanted to know how to keep track of the error cause, how to enrich its context, and finally how to present it to the clients.  

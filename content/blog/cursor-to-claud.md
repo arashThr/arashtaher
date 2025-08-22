@@ -1,12 +1,6 @@
 +++
 title = "Switching from Cursor to Claude CLI"
 date = "2025-07-27T13:08:48+02:00"
-
-#
-# description is optional
-#
-# description = "Moving from Cursor to Claud Code: How was Cursor and why I'm moving to Claud"
-
 tags = ["ai", "llm", "pensive"]
 +++
 

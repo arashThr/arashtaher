@@ -13,6 +13,14 @@
   {{ .Content }}
 </content>
 {{ if eq .Type "blog" }}
+{{ if .Params.tags }}
+<p style="margin-top: 2em; font-size: 0.9em;">
+  <strong>Tagged:</strong>
+  {{ range (.GetTerms "tags") }}
+  <a href="{{ .Permalink }}" style="margin-right: 0.5em;">#{{ .LinkTitle }}</a>
+  {{ end }}
+</p>
+{{ end }}
 {{ readFile "layouts/shortcodes/newsletter.html" | safeHTML }}
 {{ end }}
 {{ end }}
