@@ -13,6 +13,6 @@
   {{ .Content }}
 </content>
 {{ if eq .Type "blog" }}
-{{ partial "newsletter.html" . }}
+{{ readFile "layouts/shortcodes/newsletter.html" | safeHTML }}
 {{ end }}
 {{ end }}
