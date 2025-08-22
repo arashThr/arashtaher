@@ -1,16 +1,7 @@
-<!-- A partial to be overwritten by the user.
-  Simply place a custom_head.html into
-  your local /layouts/partials-directory -->
-
+<!-- Custom head content -->
 <script defer src="https://cloud.umami.is/script.js" data-website-id="73f515d8-b683-49e5-9de3-9c85d7727019"></script>
 
-<style>
-  @font-face {
-    font-family: 'Space Grotesk';
-    src: url('/fonts/SpaceGrotesk-Regular.ttf') format('opentype');
-  }
-  :root {
-    --font-main: 'Space Grotesk', sans-serif;
-    --font-secondary: 'Space Grotesk', sans-serif;
-  }
-</style>
+<!-- Highlight.js for syntax highlighting -->
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+<script>hljs.highlightAll();</script>
