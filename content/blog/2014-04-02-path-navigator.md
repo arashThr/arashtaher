@@ -1,9 +1,8 @@
 ---
 date: "2014-04-02T17:26:57Z"
 tags:
-- c
+- csharp
 - tools
-- windows explorer
 title: Path Navigator
 ---
 

@@ -1,10 +1,8 @@
 ---
 date: "2013-09-27T20:12:02Z"
 tags:
-- c
-- parsing
-- prettyprint
-- reformatting
+- csharp
+- compilers
 title: PrettyPrint C# codes via NRefactory
 ---
 

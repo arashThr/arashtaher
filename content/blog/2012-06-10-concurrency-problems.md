@@ -2,7 +2,6 @@
 date: "2012-06-10T16:23:26Z"
 tags:
 - concurrency
-- thread
 title: Concurrency problems
 ---
 

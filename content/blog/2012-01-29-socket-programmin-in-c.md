@@ -1,7 +1,7 @@
 ---
 date: "2012-01-29T17:11:54Z"
 tags:
-- c
+- csharp
 - programming
 - sockets
 title: Socket Programming in C

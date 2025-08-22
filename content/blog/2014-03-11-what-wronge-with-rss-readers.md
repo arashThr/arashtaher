@@ -2,7 +2,8 @@
 date: "2014-03-11T19:31:47Z"
 tags:
 - ideas
-- readers
+- apps
+- web
 title: What Wrong With RSS Readers
 ---
 

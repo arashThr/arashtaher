@@ -1,9 +1,9 @@
 ---
 date: "2013-09-22T06:20:16Z"
 tags:
-- c
+- csharp
 - parser
-- obfuscation
+- compilers
 title: 'NRefactory: Front-end parser for C#'
 ---
 

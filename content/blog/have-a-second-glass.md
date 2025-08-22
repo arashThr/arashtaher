@@ -2,7 +2,7 @@
 title = "If You Wear Glasses, You Need a Second Pair for Reading"
 date = "2025-08-17T13:38:24+02:00"
 description = "Constantly staring at a screen was causing major eye strain. Getting a second, dedicated pair of glasses was a simple life hack that fixed the problem and came with some other surprising perks."
-tags = ["life hack", "eyeglasses", "productivity", "wellness"]
+tags = ["life hacks", "productivity", "wellness", "health"]
 +++
 
 Having a second pair of glasses dedicated to reading and computer work has had multiple benefits for me. Here's why you should consider it:

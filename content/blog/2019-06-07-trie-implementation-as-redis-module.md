@@ -1,7 +1,7 @@
 ---
 date: "2019-06-07T21:26:27Z"
 tags:
-- c
+- csharp
 - database
 - redis
 title: Trie implementation as Redis module
