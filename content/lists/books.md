@@ -11,8 +11,8 @@ These are books I have read or plan to read, along with some audio books.
 - [X] Deep work
 - [X] Moonwalking with Einstein - Useful tips, scientific, engaging story
 - [X] 12 Rules for Life
-- [ ] The Psychology of Money
-- [ ] Simple path to wealth
+- [ ] The Man Who Solved the Market
+- [ ] Inside the black box
 - [The Future of Fusion Energy (Popular Science)](https://eli.thegreenplace.net/2022/book-review-the-future-of-fusion-energy-by-j-parisi-and-j-ball/)
 - [A Random Walk Down Wall Street](https://www.amazon.com/Random-Walk-Down-Wall-Street-dp-1324051132/dp/1324051132/ref=nav_signin)
 - [ ] How not to age
@@ -60,6 +60,7 @@ These are books I have read or plan to read, along with some audio books.
 - [Guardian best of 21st century](https://www.theguardian.com/books/2019/sep/21/best-books-of-the-21st-century)
 - [Financial Tortoise](https://www.financialtortoise.com/bestbooks)
 - [Guardian best of 21st century](https://www.theguardian.com/books/2019/sep/21/best-books-of-the-21st-century)
+- [Brandur's list](https://brandur.org/reading)
 
 
 - [X] کافکا در کرانه

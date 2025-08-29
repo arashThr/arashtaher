@@ -10,6 +10,7 @@ Below is a collection of games I've played, enjoyed, or found interesting.
 - [ ] What Remains of Edith Finch
 - [ ] Thomas was alone
 - [X] Dredge - 8
+- [ ] [Valheim](https://www.youtube.com/watch?v=a_-Umb1-xyI)
 
 ## Online
 

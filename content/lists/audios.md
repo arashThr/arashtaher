@@ -1,5 +1,5 @@
 ---
-title: My Audios
+title: Audio
 summary: A collection of my favorite audio content including podcasts, audiobooks, and more.
 ---
 
