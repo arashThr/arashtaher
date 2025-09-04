@@ -46,11 +46,12 @@ These are movies I've watched, rated, and categorized for easy reference. The ra
 - [X] Office Space - 6
 - [x] American Psycho - 7
 - [x] F1 - 8
-- [ ] Inside
+- [x] Materialist - 6
 - [ ] The big blue
 - [ ] Parasite
 - [ ] Spring, Summer, Fall, Winter... and Spring
 - [ ] The Phantom of the Opera
+- [ ] No Other Choice
 - [ ] Death in Nile
 - [ ] The Whale
 - [ ] All Quiet on the Western Front
@@ -69,7 +70,8 @@ These are movies I've watched, rated, and categorized for easy reference. The ra
 - [ ] True lies
 - [ ] 2046
 - [ ] Fallen angel
-- [ ] Wings of Desire
+- [ ] A House of Dynamite
+- [ ] Father, Mother, Sister, Brother
 
 ## Shows
 - [X] Inside (Bo Burnham) - 9
@@ -97,6 +99,8 @@ These are movies I've watched, rated, and categorized for easy reference. The ra
 - [ ] Peter and the wolf
 - [ ] Fantastic planet
 - [x] Suzume - 5
+- [ ] Coco
+- [ ] KPop Demon Hunter
 
 ## Series
 
@@ -119,6 +123,7 @@ These are movies I've watched, rated, and categorized for easy reference. The ra
 - [ ] [Clark](https://www.imdb.com/title/tt12304420/)
 - [ ] Blossoms Shanghai
 - [ ] Smack the Pony
+- [ ] Barracuda Queens
 
 ## Documentaries
 
