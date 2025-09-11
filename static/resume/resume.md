@@ -12,7 +12,7 @@ Worked on the development of Volvo’s new test drive platform, one of the key l
 - Developed core features for Volvo’s test drive scheduling system, integrating multiple providers including Salesforce.  
 - Built tools for customers to book appointments and for retailers to manage bookings and available vehicles.  
 
-**Tech stack:** Go, Node.js, React, GraphQL, GitHub Actions, ArgoCD, PostgreSQL, Garafana, Azure
+**Tech stack:** Go, Node.js, React, GraphQL, GitHub Actions, ArgoCD, PostgreSQL, Grafana, Azure
 
 ---
 
@@ -45,8 +45,8 @@ Deriv.com is a 24/7 online trading platform offering a wide range of derivatives
 *Tehran, Iran — 02/2017–02/2018*  
 Developer of the multiplayer strategy game *Mafioso*.  
 
-- Sole back-end developer; scaled game from hundreds to thousands of concurrent players.  
-- Implemented new features including clan battles and replay system.
+- Sole back-end developer; scaled game to thousands of concurrent players.  
+- Implemented new numerous features, including clan battles, leaderboards and replay system.
 
 **Tech stack:** Node.js, Redis, MongoDB, FluentD, RabbitMQ
 
