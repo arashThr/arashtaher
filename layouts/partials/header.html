@@ -1,4 +1,31 @@
 <a href="{{ "" | relURL }}" class="title">
   <h2>{{ .Site.Title }}</h2>
 </a>
-<nav>{{- partial "nav.html" . -}}</nav>
+<button class="menu-toggle" onclick="toggleMenu()">Menu</button>
+<nav id="main-nav">{{- partial "nav.html" . -}}</nav>
+
+<script>
+function toggleMenu() {
+  const nav = document.getElementById('main-nav');
+  nav.classList.toggle('show');
+}
+
+// Close menu when clicking outside
+document.addEventListener('click', function(event) {
+  const nav = document.getElementById('main-nav');
+  const toggle = document.querySelector('.menu-toggle');
+  
+  if (!nav.contains(event.target) && !toggle.contains(event.target)) {
+    nav.classList.remove('show');
+  }
+});
+
+// Close menu when clicking on a nav link (on mobile)
+document.querySelectorAll('nav a').forEach(link => {
+  link.addEventListener('click', () => {
+    if (window.innerWidth <= 768) {
+      document.getElementById('main-nav').classList.remove('show');
+    }
+  });
+});
+</script>

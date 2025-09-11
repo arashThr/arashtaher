@@ -1,3 +1,58 @@
 {{ define "main" }}
-{{ .Content }}
+<div class="hero-section">
+  <h1 class="hero-title">Arash Taher</h1>
+  <p class="hero-subtitle">Software Engineer • Stockholm, Sweden</p>
+  <p class="hero-description">I build scalable software solutions and create meaningful digital experiences.</p>
+  <div class="hero-links">
+    <a href="/blog/" class="cta-button primary">Read Blog</a>
+  </div>
+</div>
+
+<section class="about-section">
+  <h2>About</h2>
+  <p>I like making stuff and building things. Let me know if you have a problem that I can help you tackle, or if you're interested in joining me in solving one. Here's <a href="/cv/">my cv</a> for the crawling bots.</p>
+  
+  <p>I write about tech in <a href="/blog/">my blog</a>, and about more personal stuff in my <a href="https://fa.arashtaher.com/">Farsi blog</a>.</p>
+</section>
+
+<section class="projects-section">
+  <h2>previous projects</h2>
+  
+  <h3>tech</h3>
+  <ul>
+    <li><a href="https://getpensive.com">Pensive</a>: Bookmarking solution</li>
+    <li><a href="https://github.com/arashThr/partalk/">Partalk</a>: Measured sessions between customers and consultants</li>
+    <li><a href="http://rikhtaar.ir/">Rikhtaar</a>: Concrete sculptures</li>
+  </ul>
+</section>
+
+<section class="blog-section">
+  <h2>recent posts</h2>
+  <ul>
+    {{ range first 5 (where .Site.RegularPages "Section" "blog") }}
+    <li><a href="{{ .Permalink }}">{{ .Title }}</a>: {{ .Summary | truncate 60 }}</li>
+    {{ end }}
+  </ul>
+  <p><a href="/blog/" class="view-all-link">→ view all posts</a></p>
+</section>
+
+<section class="media-section">
+  <h3>podcasting</h3>
+  <ul>
+    <li><a href="https://radiodaal.ir/">Radio Daal Podcast</a>: diaspora stories</li>
+    <li><a href="https://arashthr.github.io/prpodcast-website/">PR Podcast</a>: open source stories</li>
+    <li><a href="https://soundcloud.com/atomicwarseries">Atomic Wars Series</a>: premium podcast series from StringCast</li>
+  </ul>
+</section>
+
+<section class="contact-section">
+  <h2>Let's Connect</h2>
+  <p>I'm always interested in discussing new opportunities, collaborating on projects, or just having a conversation about technology and ideas.</p>
+  
+  <p><a href="/contact/" class="cta-button">Get In Touch</a></p>
+  
+  <div class="newsletter-container">
+    {{ .Content }}
+  </div>
+</section>
 {{ end }}

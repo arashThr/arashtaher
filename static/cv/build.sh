@@ -3,11 +3,11 @@
 # Use this script for generating the HTML version of the resume
 # Don't forget to update Email and Phone number before printing
 
-pandoc resume.md \
+pandoc cv.md \
   --from markdown \
   --to html5 \
   --template=template.html \
   --css=style.css \
   -s -o index.html
 
-echo "✅ Resume generated: index.html — open in browser to print to PDF"
+echo "✅ CV generated: index.html — open in browser to print to PDF"

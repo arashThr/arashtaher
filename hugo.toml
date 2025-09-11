@@ -16,6 +16,25 @@ enableRobotsTXT = true
 
   favicon = "images/favicon.png"
 
+# Menu configuration
+[menu]
+  [[menu.main]]
+    name = "Home"
+    url = "/"
+    weight = 1
+  [[menu.main]]
+    name = "Blog"
+    url = "/blog/"
+    weight = 2
+  [[menu.main]]
+    name = "Lists"
+    url = "/lists/"
+    weight = 3
+  [[menu.main]]
+    name = "CV"
+    url = "/cv/"
+    weight = 4
+
   # These "images" are used for the structured data templates. This will show up, when
   # services like Twitter or Slack want to generate a preview of a link to your site.
   # See https://gohugo.io/templates/internal#twitter-cards and
@@ -30,3 +49,6 @@ enableRobotsTXT = true
 [markup]
   [markup.highlight]
     codeFences = false
+  [markup.goldmark]
+    [markup.goldmark.renderer]
+      unsafe = true
