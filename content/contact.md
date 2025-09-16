@@ -4,7 +4,7 @@ menu = "main"
 weight = 30
 +++
 
-Send me email at lusty-cuddle-deck at duck dot com
+Send me email at arashThr+blog at outlook dot com
 
 GitHub: [arashthr](https://github.com/arashThr)
 

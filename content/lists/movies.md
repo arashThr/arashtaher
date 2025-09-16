@@ -47,6 +47,8 @@ These are movies I've watched, rated, and categorized for easy reference. The ra
 - [x] American Psycho - 7
 - [x] F1 - 8
 - [x] Materialist - 6
+- [x] 2046 - 5
+- [ ] Bridge of spies
 - [ ] The big blue
 - [ ] Parasite
 - [ ] Spring, Summer, Fall, Winter... and Spring
@@ -68,7 +70,6 @@ These are movies I've watched, rated, and categorized for easy reference. The ra
 - [ ] The invisible guest
 - [ ] Shoplifters
 - [ ] True lies
-- [ ] 2046
 - [ ] Fallen angel
 - [ ] A House of Dynamite
 - [ ] Father, Mother, Sister, Brother
@@ -90,17 +91,17 @@ These are movies I've watched, rated, and categorized for easy reference. The ra
 - [X] Your Name - 9
 - [X] Howl's Moving Castle - 7
 - [X] Puss in boots: The last wish - 8
-- [ ] Spiderman: Into the Spiderverse
 - [X] Spiderman: Across the Spiderverse - 9
+- [x] Luca - 2
+- [x] Suzume - 5
+- [x] KPop Demon Hunter: 6
+- [ ] Spiderman: Into the Spiderverse
 - [ ] Wildwood
-- [ ] Luca
 - [ ] The bad guys
 - [ ] The red turtle
 - [ ] Peter and the wolf
 - [ ] Fantastic planet
-- [x] Suzume - 5
 - [ ] Coco
-- [ ] KPop Demon Hunter
 
 ## Series
 
@@ -117,11 +118,10 @@ These are movies I've watched, rated, and categorized for easy reference. The ra
     - [x] Season 2 - I stopped watching it halfway
 - [x] Fleabag - 8
 - [x] The black mirror (Season 6)
-- [ ] Erased
+- [x] Erased - 7
 - [ ] Joe Pear Talks With You
 - [ ] Attack on Titans
 - [ ] [Clark](https://www.imdb.com/title/tt12304420/)
-- [ ] Blossoms Shanghai
 - [ ] Smack the Pony
 - [ ] Barracuda Queens
 
@@ -136,6 +136,8 @@ These are movies I've watched, rated, and categorized for easy reference. The ra
 - [X] Robbin Williams - 5
 - [X] Becoming Warren Buffet - 4
 - [x] The Lost Leonardo - 9
+- [ ] Get back (Beatles)
+- [ ] Doctor Sleep
 - [ ] How Music Got Free
 - [ ] The real Charlie Chaplin
 - [ ] The kingdom of dreams and madness
