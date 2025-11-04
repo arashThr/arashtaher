@@ -29,10 +29,13 @@ These are books I have read or plan to read, along with some audio books.
 
 ### Fiction
 - [X] The hitchhiker's guide to galaxy - Maybe I would have liked it ten years ago. Although I can understand its point of view and the humorous/clever/absurd look at the events, but I didn't find it very much engaging
-- [ ] Island (Huxley novel)
+- [X] Catcher in the rye
+- [ ] **A Kiss Before Dying by Ira Levin** - Recommended by Woody Allen in one his interviews
+- [ ] Island - Huxley novel
 - [ ] Crime and punishment
 - [ ] Grapes of wrath
 - [ ] [What Do You Do With a Chance?](https://world.hey.com/dhh/what-do-you-do-with-a-chance-24c0714b)
+- [ ] Trial - kafka
 
 ### Tech
 - [X] Monolith to Micro-services
@@ -45,10 +48,10 @@ These are books I have read or plan to read, along with some audio books.
 ### Audio books
 - [X] Build - 7
 - [X] Surely You're Joking, Mr. Feynman! - Such a lovely listen. Gets better as it goes forward. Be ready for more than just science. Easy to listen - 8
-- [ ] **Economics basics**
 - [X] [The First Fifteen Lives of Harry August](https://youtu.be/dMYgY5FhO3M?t=306) - Loved it (9): Science-fiction/action-thriller. Great character building. Audio book narration is amazing
 - [X] All systems red: Murderbot Diaries - Nice to hear the story from the point of view of a cyborg. Probably I will continue with the series - 6
 - [X] I, Robot - Isaac Asimov - 3
+- [ ] **Economics basics**
 
 ### Lists
 
@@ -61,12 +64,13 @@ These are books I have read or plan to read, along with some audio books.
 - [Financial Tortoise](https://www.financialtortoise.com/bestbooks)
 - [Guardian best of 21st century](https://www.theguardian.com/books/2019/sep/21/best-books-of-the-21st-century)
 - [Brandur's list](https://brandur.org/reading)
+- [Newbery Medal Winners](https://en.wikipedia.org/wiki/Newbery_Medal)
 
 
 - [X] کافکا در کرانه
+- [X] [عروس دریایی - نشر افق]
+- [X] هیچ دوستی به جز کوهستان
+- [X] پاچینکو
 - [ ] در جستجوی طبیعت - غریزه زیست‌گرایی
 - [ ] هویت - میلا کوندرا
-- [X] [عروس دریایی - نشر افق]
 - [ ] در ستایش بطالت، نوشته‌ی برتراند راسل، ترجمه محمدرضا خانی، نشر نیلوفر
-- [X] هیچ دوستی به جز کوهستان
-- [ ] **پاچینکو**
