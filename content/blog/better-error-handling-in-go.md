@@ -5,7 +5,7 @@ description = "A second overview on the best ways to do error handling in Go"
 tags = ["go", "error handling", "programming"]
 +++
 
-Here's an amendment to my [previous post]({{< ref "2024-09-05-go-error-handling-techniques-exploring-sentinel-errors-custom-types-and-client-facing-errors.md" >}}) on Go error handling that I wrote a year ago. Since then, my knowledge of Go has grown significantly, and I now have a better understanding of how things work.
+Here's an amendment to my [previous post]({{< ref "2024-09-05-go-error-handling-sentinel-errors.md" >}}) on Go error handling that I wrote a year ago. Since then, my knowledge of Go has grown significantly, and I now have a better understanding of how things work.
 
 The problem I faced with the solution suggested in that post is that, as it turned out, if you don't have an error constant that you can easily compare errors with, using `AppError` can become cumbersome: each time you have to convert the error with `As` and check if it's an `AppError`, and that's not ideal.
 
