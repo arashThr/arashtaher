@@ -24,7 +24,7 @@ Then what the error tells us is that second client-initiated stream was failed d
 ### Solution:
 
 - On the client side: Retry with back-off time
-- On the server side: Figure out why handling the connections fails (context deadline exceeded? time out?)
+- On the server side: Figure out why handling the connections fails (context deadline exceeded? time out?). Also, make sure you're [reading the response bodies before closing them]({{% ref "closing-responses-in-golang.md" %}}).
 
 Please let me know if you also faced the similar issue and how you handled it.  
 Hope it helps.
