@@ -13,6 +13,7 @@ enableRobotsTXT = true
 
 [params]
   description = "Arash Taher personal website"
+  author = "Arash Taher"
 
   favicon = "images/favicon.png"
 

@@ -15,7 +15,7 @@
   <!-- SEO Meta Tags -->
   <meta name="title" content="{{ with .Title }}{{ . }}{{ else }}{{ .Site.Title }}{{ end }}" />
   <meta name="description" content="{{ with .Description }}{{ . }}{{ else }}{{if .IsPage}}{{ .Summary }}{{ else }}{{ with .Site.Params.description }}{{ . }}{{ end }}{{ end }}{{ end }}" />
-  <meta name="author" content="{{ .Site.Author }}" />
+  <meta name="author" content="{{ with .Site.Params.author }}{{ . }}{{ else }}{{ .Site.Title }}{{ end }}" />
   <meta name="referrer" content="no-referrer-when-downgrade" />
 
   <!-- Open Graph / Facebook -->
