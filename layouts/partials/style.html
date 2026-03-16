@@ -542,6 +542,31 @@
   .blog-section .view-all-link:hover {
     color: var(--mondrian-yellow);
   }
+
+  .blog-section .boxed-ul li,
+  .projects-section .boxed-ul li,
+  .media-section .boxed-ul li {
+    padding: 0;
+  }
+
+  .blog-section .boxed-ul li a,
+  .projects-section .boxed-ul li a,
+  .media-section .boxed-ul li a {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 1rem;
+    padding: 1.5rem;
+  }
+
+  .blog-section .boxed-ul li a .post-date {
+    font-size: 0.8rem;
+    font-weight: 400;
+    text-transform: none;
+    letter-spacing: 0;
+    white-space: nowrap;
+    opacity: 0.7;
+  }
   
   .media-section {
     grid-column: 1;
