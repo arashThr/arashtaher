@@ -19,7 +19,7 @@
   <h2>previous projects</h2>
   
   <h3>tech</h3>
-  <ul>
+  <ul class="boxed-ul">
     <li class="red-li"><a href="https://getpensive.com">Pensive</a>: Bookmarking solution</li>
     <li class="black-li"><a href="https://github.com/arashThr/partalk/">Partalk</a>: Measured sessions between customers and consultants</li>
     <li class="blue-li"><a href="http://rikhtaar.ir/">Rikhtaar</a>: Concrete sculptures</li>
@@ -28,7 +28,7 @@
 
 <section class="blog-section">
   <h2>recent posts</h2>
-  <ul>
+  <ul class="boxed-ul">
     {{ range first 5 (where .Site.RegularPages "Section" "blog") }}
     <li><a href="{{ .Permalink }}">{{ .Title }}</a>: {{ .Summary | truncate 60 }}</li>
     {{ end }}
@@ -38,10 +38,25 @@
 
 <section class="media-section">
   <h3>podcasting</h3>
-  <ul>
+  <ul class="boxed-ul">
     <li><a href="https://radiodaal.ir/">Radio Daal Podcast</a>: diaspora stories</li>
     <li><a href="https://arashthr.github.io/prpodcast-website/">PR Podcast</a>: open source stories</li>
     <li class="blue-li"><a href="https://soundcloud.com/atomicwarseries">Atomic Wars Series</a>: premium podcast series from StringCast</li>
+  </ul>
+</section>
+
+<section class="reach-out-section">
+  <h3>Reach out</h3>
+  <div>
+  Send me a message if:
+  </div>
+  <ul class="spaced-ul">
+    <li>you need help with your <b>pet project</b></li>
+    <li>you want to learn about <b>Linux</b>, self-hosting or free software</li>
+    <li>you are interested in learning about computers and <b>programming</b></li>
+    <li>you are creating your <b>podcast</b></li>
+    <li>you are making a <b>movie</b>!</li>
+    <li>you're going to a <b>LOTR</b> marathon</li>
   </ul>
 </section>
 
