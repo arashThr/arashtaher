@@ -59,7 +59,7 @@ Yeah, I saw it at the end of the tunnel. Don’t get me wrong, I like React. It 
 
 But did I want magic in my small humble project? Nope. I just wanted code I could understand when I woke up in the morning.
 
-## Enter HTMX.
+## Enters HTMX.
 
 Yes, I fell for the memes. Call me lame, but it worked. And surprisingly, the hypermedia philosophy made perfect sense to me.
 

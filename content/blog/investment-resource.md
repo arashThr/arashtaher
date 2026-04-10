@@ -3,8 +3,6 @@ title: "Investment Resource"
 date: 2026-03-24T23:10:31+01:00
 ---
 
-# Investment Resources
-
 You need to know how to invest your money. I never learned. Here's a summary of some of the best resources I found to educate myself on the topic.
 
 Most important lesson: The absolute best resource is by far the fact sheet (Faktablad) for each fund. Learn to read it.
