@@ -612,6 +612,29 @@
     color: var(--mondrian-white);
   }
 
+  .memos-section {
+    grid-column: 2;
+    grid-row: 3;
+    background: var(--mondrian-red);
+    border-top: 8px solid var(--mondrian-black);
+    border-bottom: 8px solid var(--mondrian-black);
+    line-height: 2.5;
+    color: var(--mondrian-white);
+  }
+
+  .memos-section h3 {
+    color: var(--mondrian-yellow);
+    border-bottom: 3px solid var(--mondrian-black);
+  }
+
+  .memos-section iframe {
+    padding-top: 10px;
+    flex: 1;              /* fill remaining space */
+    width: 100%;
+    border: none;
+    min-height: 400px;   /* fallback for small screens */
+  }
+
   /* Right side decorative windows */
   main::before {
     display: none;
