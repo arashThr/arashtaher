@@ -42,8 +42,10 @@ These are books I have read or plan to read, along with some audio books.
 - [X] Don't make me think
 - [X] Rocket surgery made easy
 - [X] Perl Medic
-- [ ] Domain-driven design with Go
-- [ ] A Philosophy of Software Design
+- [ ] The Anatomy of Go - Master Go's Inner Workings
+- [ ] Network Programming with Go
+- [ ] High Performance Browser Networking
+- [ ] Designing Data-Intensive Applications
 
 ### Audio books
 - [X] Build - 7
@@ -65,6 +67,7 @@ These are books I have read or plan to read, along with some audio books.
 - [Guardian best of 21st century](https://www.theguardian.com/books/2019/sep/21/best-books-of-the-21st-century)
 - [Brandur's list](https://brandur.org/reading)
 - [Newbery Medal Winners](https://en.wikipedia.org/wiki/Newbery_Medal)
+- [Phil Eaton's list](https://notes.eatonphil.com/tags/books.html)
 
 
 - [X] کافکا در کرانه

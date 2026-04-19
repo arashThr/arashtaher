@@ -70,5 +70,5 @@ Rayvarz is a leading Iranian software company focused on ERP and MIS systems.
 
 ## Education
 
-**M.Sc. Computer Engineering** — Qazvin University, Qazvin, Iran (2014–2016)
+**M.Sc. Computer Engineering** — Qazvin University, Qazvin, Iran (2014–2016)  
 **B.Sc. Computer Engineering** — Shiraz University, Shiraz, Iran (2009–2013)
