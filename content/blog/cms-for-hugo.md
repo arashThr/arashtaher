@@ -35,4 +35,4 @@ Now let's see if the publish also works as expected!
 
 And now adding an image from my phone...
 
-![1777574330594-1000009100.jpg](/images/1777574330594-1000009100.jpg)
+![1777574452231-1000008792.jpg](/images/1777574452231-1000008792.jpg)
