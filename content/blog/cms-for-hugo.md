@@ -1,6 +1,6 @@
 +++
 title = "CMS for Hugo"
-date = "2026-04-30T15:03:00.000Z"
+date = "2026-04-30T13:03:00.000Z"
 tags = [ "blog", "content", "ai", "vibe" ]
 +++
 
@@ -25,11 +25,10 @@ int main() {
 }
 ```
 
-```
-```
-
 I used Antigravity for this application. I went quite smoothly.
 
 The look is plain and dull, but it only took a few prompts to make it work.
 
 Now let's see if the publish also works as expected!
+
+*Edit:* Posting was succesful. Next: Editing the post.
