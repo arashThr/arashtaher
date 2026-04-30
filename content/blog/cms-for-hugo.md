@@ -1,6 +1,6 @@
 +++
 title = "CMS for Hugo"
-date = "2026-04-30T13:03:00.000Z"
+date = "2026-04-30T15:03:00.000Z"
 tags = [ "blog", "content", "ai", "vibe" ]
 +++
 
