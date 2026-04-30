@@ -32,3 +32,7 @@ The look is plain and dull, but it only took a few prompts to make it work.
 Now let's see if the publish also works as expected!
 
 *Edit:* Posting was succesful. Next: Editing the post.
+
+And now adding an image from my phone...
+
+![1777574330594-1000009100.jpg](/images/1777574330594-1000009100.jpg)
