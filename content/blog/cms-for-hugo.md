@@ -1,6 +1,6 @@
 +++
 title = "CMS for Hugo"
-date = "2026-04-30T13:03:00.000Z"
+date = "2026-04-30T11:03:00.000Z"
 tags = [ "blog", "content", "ai", "vibe" ]
 +++
 
@@ -34,3 +34,7 @@ Now let's see if the publishing also works as expected!
 And now adding an image from my phone...
 
 ![1777574452231-1000008792.jpg](/images/1777574452231-1000008792.jpg)
+
+I have also added a feature to compress the images and let you select size. Let's try it:
+
+![1777629796948-alexandr-bormotin-vI3BV8AwHQc-unsplash.jpg](/images/1777629796948-alexandr-bormotin-vI3BV8AwHQc-unsplash.jpg)
