@@ -1,4 +1,5 @@
-+++
+++
++
 title = "Closing Response body in Go is not enough"
 date = "2025-11-04T16:00:00+02:00"
 description = "Sharing a personal lesson on resource management when it comes to Go's HTTP responses"
