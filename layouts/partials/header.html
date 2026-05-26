@@ -1,9 +1,8 @@
-<a href="{{ "" | relURL }}">
-  <h2>{{ .Site.Title }}</h2>
-</a>
 <button onclick="toggleMenu()">Menu</button>
-<nav id="main-nav">{{- partial "nav.html" . -}}</nav>
-
+<nav id="main-nav">
+  <a href="{{ "" | relURL }}">Main</a>
+  {{- partial "nav.html" . -}}
+</nav>
 <script>
 function toggleMenu() {
   const nav = document.getElementById('main-nav');
