@@ -5,3 +5,6 @@ hugo_build.lock
 .DS_Store
 .idea/
 .vscode/
+
+# Un-ignore the tags directory which is often ignored globally due to ctags
+!content/tags/
