@@ -1,103 +1,83 @@
 {{ define "main" }}
-<div class="hero-section">
-  <h1 class="hero-title">Arash Taher</h1>
-  <p class="hero-subtitle">Software Engineer • Stockholm, Sweden</p>
-  <p class="hero-description">I build scalable software solutions and create meaningful digital experiences.</p>
-  <div class="hero-links">
-    <a href="/blog/" class="cta-button primary">Read Blog</a>
-  </div>
-</div>
-<div class="hero-photo-cell">
-  <img src="/images/me.jpg" alt="Arash Taher" class="hero-photo" />
+<div>
+  <h1>Arash Taher</h1>
+  <p>Software Engineer • Stockholm, Sweden</p>
+  <p>I build scalable software solutions and create meaningful digital experiences.</p>
 </div>
 
-<section class="about-section">
+<section>
   <h2>About</h2>
-  <p>I like making stuff and building things. Let me know if you have a problem that I can help you tackle, or if you're interested in joining me in solving one. Here's <a href="/cv/">my cv</a> for the crawling bots.</p>
-  
-  <p>I write about tech in <a href="/blog/">my blog</a>, and about more personal stuff in my <a href="https://fa.arashtaher.com/">Farsi blog</a>.</p>
+  <p>I like making stuff and building things. Let me know if you have a problem that I can help you tackle, or if you're
+    interested in joining me in solving one. Here's <a href="/cv/">my cv</a> for the crawling bots.</p>
+
+  <p>I write about tech in <a href="/blog/">my blog</a>, and about more personal stuff in my <a
+      href="https://fa.arashtaher.com/">Farsi blog</a>.</p>
 </section>
 
-<section class="projects-section">
-  <h2>previous projects</h2>
-  
-  <h3>tech</h3>
-  <ul class="boxed-ul">
-    <li class="red-li"><a href="https://getpensive.com">Pensive: Bookmarking solution</a></li>
-    <li class="black-li"><a href="https://github.com/arashThr/partalk/">Partalk: Measured sessions between customers and consultants</a></li>
-    <li class="blue-li"><a href="http://rikhtaar.ir/">Rikhtaar: Concrete sculptures</a></li>
+<section>
+  <h2>Links</h2>
+  <ul>
+    <li><a href="/blog/">Blog</a></li>
+    <li><a href="https://memos.arashtaher.com/explore">TIL (Memos)</a></li>
   </ul>
 </section>
 
-<section class="blog-section">
-  <h2>recent posts</h2>
-  <ul class="boxed-ul">
-    {{ range first 5 (where .Site.RegularPages "Section" "blog") }}
-    <li><a href="{{ .Permalink }}"><span>{{ .Title }}</span><span class="post-date">{{ .Date.Format "Jan 2, 2006" }}</span></a></li>
-    {{ end }}
+<section>
+  <h2>Projects</h2>
+  <ul>
+    <li><a href="https://getpensive.com">Pensive: Bookmarking solution</a></li>
+    <li><a href="https://github.com/arashThr/partalk/">Partalk: Measured sessions between customers and
+        consultants</a></li>
+    <li><a href="http://rikhtaar.ir/">Rikhtaar: Concrete sculptures</a></li>
   </ul>
-  <p><a href="/blog/" class="view-all-link">→ view all posts</a></p>
 </section>
 
-<section class="media-section">
-  <h3>podcasting</h3>
-  <ul class="boxed-ul">
+<section>
+  <h2>Talks & Podcasting</h2>
+  <ul>
     <li><a href="https://radiodaal.ir/">Radio Daal Podcast: diaspora stories</a></li>
     <li><a href="https://arashthr.github.io/prpodcast-website/">PR Podcast: open source stories</a></li>
-    <li class="blue-li"><a href="https://soundcloud.com/atomicwarseries">Atomic Wars Series: premium podcast series from StringCast</a></li>
+    <li><a href="https://soundcloud.com/atomicwarseries">Atomic Wars Series: premium podcast series from
+        StringCast</a></li>
   </ul>
 </section>
 
-<section class="memos-section">
-  <h3>Today I learned</h3>
-  <div>
-    Wondering what I'm learning these days? Check out my <a href="https://usememos.com">memos</a>:
-  </div>
-  <div display="flex">
-    <iframe src="https://memos.arashtaher.com/explore"></iframe>
-  </div>
-</section>
-
-<section class="reach-out-section">
-  <h3>Reach out</h3>
-  <div>
-  Send me a message if:
-  </div>
-  <ul class="spaced-ul">
-    <li>you need help with your <b>pet project</b></li>
-    <li>you want to learn about <b>Linux</b>, self-hosting or free software</li>
-    <li>you are interested in learning about computers and <b>programming</b></li>
-    <li>you are creating your <b>podcast</b></li>
-    <li>you are making a <b>movie</b>!</li>
-    <li>you're going to a <b>LOTR</b> marathon</li>
-  </ul>
+<section>
+  <details>
+    <summary><h3 style="display:inline; cursor:pointer;">Reach out if...</h3></summary>
+    <ul style="margin-top: 1rem;">
+      <li>you need help with your <b>pet project</b></li>
+      <li>you want to learn about <b>Linux</b>, self-hosting or free software</li>
+      <li>you are interested in learning about computers and <b>programming</b></li>
+      <li>you are creating your <b>podcast</b></li>
+      <li>you are making a <b>movie</b>!</li>
+      <li>you're going to a <b>LOTR</b> marathon</li>
+    </ul>
+  </details>
   <!-- Google Calendar Appointment Scheduling begin -->
   <link href="https://calendar.google.com/calendar/scheduling-button-script.css" rel="stylesheet">
   <script src="https://calendar.google.com/calendar/scheduling-button-script.js" async></script>
   <script>
-    (function() {
-	var target = document.currentScript;
-	window.addEventListener('load', function() {
-	    calendar.schedulingButton.load({
-		url: 'https://calendar.google.com/calendar/appointments/schedules/AcZssZ0AAcLjaHO1_RkwX7WbviJ3_SKbncFOR9ngjliydTnFA-BKaCwuXX7AyiRJ-n0ouR7j7Ua4bSAz?gv=true',
-		color: '#3F51B5',
-		label: 'Book an appointment',
-		target,
-	    });
-	});
+    (function () {
+      var target = document.currentScript;
+      window.addEventListener('load', function () {
+        calendar.schedulingButton.load({
+          url: 'https://calendar.google.com/calendar/appointments/schedules/AcZssZ0AAcLjaHO1_RkwX7WbviJ3_SKbncFOR9ngjliydTnFA-BKaCwuXX7AyiRJ-n0ouR7j7Ua4bSAz?gv=true',
+          color: '#3F51B5',
+          label: 'Book an appointment',
+          target,
+        });
+      });
     })();
   </script>
   <!-- end Google Calendar Appointment Scheduling -->
 </section>
 
-<section class="contact-section">
+<section>
   <h2>Let's Connect</h2>
-  <p>I'm always interested in discussing new opportunities, collaborating on projects, or just having a conversation about technology and ideas.</p>
-  
-  <p><a href="/contact/" class="cta-button">Get In Touch</a></p>
-  
-  <div class="newsletter-container">
-    {{ .Content }}
-  </div>
+  <p>I'm always interested in discussing new opportunities, collaborating on projects, or just having a conversation
+    about technology and ideas.</p>
+
+  <p><a href="/contact/">Get In Touch</a></p>
 </section>
 {{ end }}

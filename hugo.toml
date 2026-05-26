@@ -20,10 +20,6 @@ enableRobotsTXT = true
 # Menu configuration
 [menu]
   [[menu.main]]
-    name = "Home"
-    url = "/"
-    weight = 1
-  [[menu.main]]
     name = "Blog"
     url = "/blog/"
     weight = 2

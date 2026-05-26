@@ -1,7 +1,7 @@
 {{ define "main" }}
 <content>
   {{ if .Content }}
-  <div class="list-description">
+  <div>
     {{ .Content }}
   </div>
   {{ end }}
@@ -11,17 +11,15 @@
     <a href="{{ "blog" | relURL }}">Remove filter</a>
   </small>
   {{ end }}
-  <ul class="blog-posts">
+  <ul>
     {{ range .Pages }}
     <li>
-      <span>
-        <i>
-          <time datetime='{{ .Date.Format "2006-01-02" }}'>
-            {{ .Date.Format (default "02 Jan, 2006" .Site.Params.dateFormat) }}
-          </time>
-        </i>
-      </span>
       <a href="{{ .Permalink }}">{{ .Title }}</a>
+      <span style="color: var(--meta-color); font-size: 0.85em; margin-left: 0.5rem; white-space: nowrap;">
+        <time datetime='{{ .Date.Format "2006-01-02" }}'>
+          {{ .Date.Format (default "02 Jan, 2006" .Site.Params.dateFormat) }}
+        </time>
+      </span>
     </li>
     {{ else }}
     <li>

@@ -20,5 +20,4 @@ Telegram: I'm [arash's eyeholes](https://t.me/arashsEyeholes)
 
 Stay updated with my latest posts and thoughts:
 
-{{< newsletter >}}
 

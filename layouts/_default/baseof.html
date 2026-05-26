@@ -38,7 +38,7 @@
   <header>
     {{- partial "header.html" . -}}
   </header>
-  <main{{ if not .IsHome }} class="single-page"{{ end }}>
+  <main{{ if not .IsHome }}{{ end }}>
     {{- block "main" . }}{{- end }}
   </main>
   <footer>
