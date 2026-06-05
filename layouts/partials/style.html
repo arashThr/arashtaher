@@ -106,10 +106,29 @@
   }
 
   p,
-  blockquote,
   li {
     text-wrap: pretty;
     margin-bottom: 1rem;
+  }
+
+  /* Blockquotes */
+  blockquote {
+    border-left: 4px solid var(--meta-color);
+    margin: 1.5rem 0;
+    padding: 1rem 1.5rem;
+    color: var(--meta-color);
+    font-style: italic;
+    background-color: var(--bg-color-muted);
+    border-radius: 0 2px 2px 0;
+    text-wrap: pretty;
+  }
+
+  blockquote p:first-child {
+    margin-top: 0;
+  }
+
+  blockquote p:last-child {
+    margin-bottom: 0;
   }
 
   /* Links */
