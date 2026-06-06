@@ -1,72 +1,82 @@
+Software engineer with over 8 years of experience across finance, gaming, and customer-focused web platforms.
 
-Software engineer with over 8 years of experience across finance, gaming, and customer-focused web platforms. I believe in building with empathy, and I actively use and study the products I help develop to better understand the customer journey.
+I am a tech-savvy engineer with immense care and attention to detail, always striving to provide the best experience for the users of my products. I do my best work when I am given ownership, and I thrive when working closely with a team that deeply cares about what they do.
 
-I thrive in environments where engineers take ownership, not just of code but of outcomes, and where teams are empowered to solve meaningful problems. I’ve also begun integrating AI into my development workflow and tooling, and I’m a strong advocate for using it to accelerate product innovation.
+Understanding first principles, obsessive focus on the customer, and fully embracing immense opportunities unlocked by AI are at the core of my approach for bringing value to products.
 
 ## Work Experience
 
-### Volvo Cars — Software Engineer, Test Drive Experience  
-*Stockholm, Sweden — 06/2024–Present*  
-Worked on the development of Volvo’s new test drive platform, one of the key lead sources for car purchases. The platform supports the entire test drive journey for both customers and retailers.  
+### Volvo Cars — Software Engineer, Test Drive Experience
 
-- Developed core features for Volvo’s test drive scheduling system, integrating multiple providers including Salesforce.  
-- Built tools for customers to book appointments and for retailers to manage bookings and available vehicles.  
+*Stockholm, Sweden — 06/2024–Present*
+
+Worked on the development of Volvo’s new test drive platform, one of the key lead sources for car purchases.
+
+* Engineered core backend features to consolidate fragmented regional systems into a single centralized platform, directly supporting Volvo's shift to direct-to-consumer sales.  
+* Built tools enabling customers to schedule appointments and retailers to manage available demo cars, contributing to a 2.2x–2.5x increase in form completions across key markets. 
 
 **Tech stack:** Go, Node.js, React, GraphQL, GitHub Actions, ArgoCD, PostgreSQL, Grafana, Azure
 
 ---
 
-### Klarna Bank AB — Software Engineer, Native Banking Network Team  
-*Stockholm, Sweden — 05/2022–05/2024*  
-Klarna is a leading provider of online financial services, offering solutions for online payments and post-purchase financing.  
+### Klarna Bank AB — Software Engineer, Native Banking Network Team
 
-- Collaborated in an 8-member team to develop SEPA payment methods: SEPA Instant, direct debit, and credit transfer.  
-- Worked with cloud infrastructure, CI/CD pipelines, and distributed systems.
+*Stockholm, Sweden — 05/2022–05/2024*
 
-**Tech stack:** Java, Typescript, Node.js, AWS (RDS, SQS, EventBridge), Jenkins, Terraform, Kafka
+Klarna is a leading provider of online financial services, offering solutions for online payments and post-purchase financing.
+
+* Developed SEPA native banking infrastructure that processed over 150 million transactions, valued at over €7 billion in 2024, maintaining high availability and extremely low error rates.
+* Optimized distributed cloud architecture to handle peak volumes of 2 million requests per day, running efficiently on just 7 to 12 AWS micro-instances.
+
+**Tech stack:** Java, TypeScript, Node.js, AWS (RDS, SQS, EventBridge), Jenkins, Terraform, Kafka
 
 ---
 
 <div class="page-break"></div>
 
-### Deriv Services Sdn Bhd — Backend Developer, Data Feed Team  
-*Cyberjaya, Malaysia — 02/2020–05/2022*  
-Deriv.com is a 24/7 online trading platform offering a wide range of derivatives.  
+### Deriv Services Sdn Bhd — Backend Developer, Data Feed Team
 
-- Led development and maintenance of price feed infrastructure, integrating with liquidity providers and distributing asset prices.  
-- Partnered with quantitative analysts to design new financial products.  
-- Scaled infrastructure to handle 150% more traffic and reduced tick latency from 800ms to 60ms.
+*Cyberjaya, Malaysia — 02/2020–05/2022*
 
-**Tech stack:** Perl, Node.js, PostgreSQL, Redis, Chef, AWS EC2, Docker, Datadog
+Deriv.com is a 24/7 online trading platform offering a wide range of derivatives.
+
+* Led the development of mission-critical price feed infrastructure, integrating new liquidity providers to onboard high-volume crypto assets and unlock new financial products.
+* Scaled infrastructure to process 50,000 published ticks per second (a 150% increase), slashing processing latency from ~800ms to 60ms.
+
+**Tech stack:** Perl, Node.js, C++, PostgreSQL, Redis, Chef, AWS EC2, Docker, Datadog
 
 ---
 
-### Paeezan Game Studio — Backend Engineer  
-*Tehran, Iran — 02/2017–02/2018*  
-Developer of the multiplayer strategy game *Mafioso*.  
+### Paeezan Game Studio — Backend Engineer
 
-- Sole back-end developer; scaled game to thousands of concurrent players.  
-- Implemented new numerous features, including clan battles, leaderboards and replay system.
+*Tehran, Iran — 02/2017–02/2018*
+
+Developer of the multiplayer strategy game *Mafioso*.
+
+* Acted as the sole backend developer shortly after launch, successfully scaling the infrastructure from hundreds to thousands of concurrent users.  
+* Shipped critical multiplayer features—including clan battles, leaderboards, and replay systems—driving a 5x increase in the active player base.
 
 **Tech stack:** Node.js, Redis, MongoDB, FluentD, RabbitMQ
 
 ---
 
-### Rayvarz Software Engineering — C# Programmer, R&D Department  
-*Tehran, Iran — 04/2013–10/2016*  
-Rayvarz is a leading Iranian software company focused on ERP and MIS systems.  
+### Rayvarz Software Engineering — C# Programmer, R&D Department
 
-- Transitioned from apprentice to full-time developer by delivering a semantic code obfuscation tool using C#.  
-- Contributed to projects including an in-house CI/CD system, HTTP/2 proxy gateway, and BPMS exception handling improvements.
+*Tehran, Iran — 04/2013–10/2016*
 
-**Tech stack:** C#, Node.js, PostgreSQL, MSSQL, AngularJS
+Rayvarz is a leading Iranian software company focused on ERP and MIS systems.
+
+* Transitioned to full-time R&D developer by building internal tooling, including code obfuscator using C# front-end parser.  
+* Improved BPMS architecture by designing an Aspect-Oriented Programming (AOP) framework for centralized exception handling.
+
+**Tech stack:** C#, Node.js, PostgreSQL, MSSQL, Angular
 
 ## Personal Projects
 
-- **[Pensive](https://getpensive.com/)** — A bookmarking solution to help building your own searchable memory of the web
-- **GPGPU Programming Research** — Conducted research using PyOpenCL to enhance parallel processing on GPUs through hybrid techniques
-- **[Radio Daal Podcast](https://radiodaal.ir/)** — Long form conversation with diasporas (In Persian)
-- **[Rikhtar](https://rikhtaar.ir/)** — 3D printed concrete sculptures
+* **[Pensive](https://getpensive.com/)** — AI bookmarking solution to help build your own searchable memory of the web
+* **GPGPU Programming Research** — Conducted research using PyOpenCL to enhance parallel processing on GPUs through hybrid techniques
+* **[Radio Daal Podcast](https://podcasts.apple.com/us/podcast/id1268317148)** — Long-form conversations with the diaspora (In Persian)
+* **[Rikhtar](https://rikhtaar.arashTaher.com/)** — 3D-printed concrete sculptures
 
 ## Education
 

@@ -67,6 +67,11 @@ h3 {
   font-size: 1.1em;
 }
 
+h3 + p {
+  margin-top: 0;
+  padding-top: 0;
+}
+
 a {
   color: #000;
   text-decoration: underline;
@@ -82,7 +87,7 @@ a {
       content: counter(page) "/" counter(pages);
     }
     @bottom-right {
-      content: "Apr 2026";
+      content: "June 2026";
     }
   }
 
