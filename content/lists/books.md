@@ -36,6 +36,7 @@ These are books I have read or plan to read, along with some audio books.
 - [ ] Grapes of wrath
 - [ ] [What Do You Do With a Chance?](https://world.hey.com/dhh/what-do-you-do-with-a-chance-24c0714b)
 - [ ] Trial - kafka
+- [ ] The Atrocity Exhibition
 
 ### Tech
 - [X] Monolith to Micro-services
