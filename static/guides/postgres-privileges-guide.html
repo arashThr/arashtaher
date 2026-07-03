@@ -1,0 +1,856 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PostgreSQL Access & Privileges — Complete Guide</title>
+    <style>
+        :root {
+            --bg: #0f1117;
+            --bg-secondary: #1a1d27;
+            --bg-card: #1e2130;
+            --border: #2d3145;
+            --text: #e2e8f0;
+            --text-muted: #8892a4;
+            --primary: #7c6af7;
+            --primary-light: #a89af9;
+            --green: #4ade80;
+            --yellow: #fbbf24;
+            --red: #f87171;
+            --blue: #60a5fa;
+            --cyan: #22d3ee;
+            --orange: #fb923c;
+            --code-bg: #141722;
+            --sidebar-width: 280px;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            line-height: 1.7;
+            display: flex;
+        }
+        .sidebar {
+            width: var(--sidebar-width);
+            min-height: 100vh;
+            background: var(--bg-secondary);
+            border-right: 1px solid var(--border);
+            position: fixed;
+            top: 0; left: 0;
+            overflow-y: auto;
+            padding: 2rem 0;
+        }
+        .sidebar-title {
+            font-size: 0.75rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            color: var(--text-muted);
+            padding: 0 1.5rem 1rem;
+            border-bottom: 1px solid var(--border);
+            margin-bottom: 1rem;
+        }
+        .sidebar a {
+            display: block;
+            padding: 0.4rem 1.5rem;
+            color: var(--text-muted);
+            text-decoration: none;
+            font-size: 0.875rem;
+            transition: color 0.15s, background 0.15s;
+            border-left: 3px solid transparent;
+        }
+        .sidebar a:hover {
+            color: var(--text);
+            background: rgba(124, 106, 247, 0.08);
+            border-left-color: var(--primary);
+        }
+        .sidebar .section-label {
+            font-size: 0.7rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            color: var(--primary-light);
+            padding: 1.2rem 1.5rem 0.3rem;
+        }
+        .main {
+            margin-left: var(--sidebar-width);
+            padding: 3rem 4rem;
+            max-width: 900px;
+            width: 100%;
+        }
+        h1 {
+            font-size: 2.5rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, var(--primary-light), var(--cyan));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 0.5rem;
+        }
+        .subtitle {
+            color: var(--text-muted);
+            font-size: 1.1rem;
+            margin-bottom: 3rem;
+        }
+        h2 {
+            font-size: 1.6rem;
+            font-weight: 700;
+            color: var(--primary-light);
+            margin: 3rem 0 1rem;
+            padding-top: 1rem;
+            border-top: 1px solid var(--border);
+        }
+        h3 {
+            font-size: 1.15rem;
+            font-weight: 600;
+            color: var(--cyan);
+            margin: 2rem 0 0.75rem;
+        }
+        p { margin-bottom: 1rem; }
+        pre {
+            background: var(--code-bg);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 1.25rem 1.5rem;
+            overflow-x: auto;
+            margin: 1rem 0 1.5rem;
+            font-size: 0.875rem;
+            line-height: 1.6;
+        }
+        code {
+            font-family: 'JetBrains Mono', 'Fira Code', Consolas, monospace;
+        }
+        p code, li code, td code {
+            background: var(--code-bg);
+            border: 1px solid var(--border);
+            border-radius: 4px;
+            padding: 0.15em 0.4em;
+            font-size: 0.85em;
+            color: var(--cyan);
+        }
+        .kw  { color: #c792ea; font-weight: 600; }
+        .fn  { color: #82aaff; }
+        .str { color: #c3e88d; }
+        .cmt { color: #546e7a; font-style: italic; }
+        .num { color: #f78c6c; }
+        .op  { color: #89ddff; }
+        .typ { color: #ffcb6b; }
+        table { width: 100%; border-collapse: collapse; margin: 1rem 0 1.5rem; font-size: 0.875rem; }
+        th {
+            background: var(--bg-secondary);
+            color: var(--primary-light);
+            font-weight: 600;
+            text-align: left;
+            padding: 0.75rem 1rem;
+            border: 1px solid var(--border);
+        }
+        td { padding: 0.6rem 1rem; border: 1px solid var(--border); vertical-align: top; }
+        tr:nth-child(even) td { background: rgba(255,255,255,0.02); }
+        .callout {
+            border-radius: 8px;
+            padding: 1rem 1.25rem;
+            margin: 1rem 0 1.5rem;
+            border-left: 4px solid;
+            font-size: 0.9rem;
+        }
+        .callout-title {
+            font-weight: 700;
+            margin-bottom: 0.4rem;
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+        .callout.warning  { background: rgba(251,191,36,0.08);  border-color: var(--yellow); }
+        .callout.warning  .callout-title { color: var(--yellow); }
+        .callout.tip      { background: rgba(74,222,128,0.08);  border-color: var(--green); }
+        .callout.tip      .callout-title { color: var(--green); }
+        .callout.danger   { background: rgba(248,113,113,0.08); border-color: var(--red); }
+        .callout.danger   .callout-title { color: var(--red); }
+        .callout.info     { background: rgba(96,165,250,0.08);  border-color: var(--blue); }
+        .callout.info     .callout-title { color: var(--blue); }
+        .callout ul { margin-top: 0.5rem; padding-left: 1.25rem; }
+        .badge {
+            display: inline-block;
+            font-size: 0.7rem;
+            font-weight: 700;
+            padding: 0.2em 0.5em;
+            border-radius: 4px;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-left: 0.4rem;
+            vertical-align: middle;
+        }
+        .badge-green  { background: rgba(74,222,128,0.15);  color: var(--green);  border: 1px solid rgba(74,222,128,0.3); }
+        .badge-yellow { background: rgba(251,191,36,0.15);  color: var(--yellow); border: 1px solid rgba(251,191,36,0.3); }
+        .badge-blue   { background: rgba(96,165,250,0.15);  color: var(--blue);   border: 1px solid rgba(96,165,250,0.3); }
+        .hierarchy {
+            background: var(--code-bg);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 1.25rem 1.5rem;
+            margin: 1rem 0 1.5rem;
+            font-family: 'JetBrains Mono', Consolas, monospace;
+            font-size: 0.875rem;
+            line-height: 2.2;
+        }
+        .hl-0 { color: var(--primary-light); font-weight: 700; }
+        .hl-1 { color: var(--cyan); padding-left: 1.5rem; }
+        .hl-2 { color: var(--green); padding-left: 3rem; }
+        .hl-3 { color: var(--text-muted); padding-left: 4.5rem; }
+        .section-anchor { display: block; position: relative; top: -80px; visibility: hidden; }
+        ul, ol { padding-left: 1.5rem; margin-bottom: 1rem; }
+        li { margin-bottom: 0.4rem; }
+        .footer {
+            margin-top: 4rem;
+            padding-top: 2rem;
+            border-top: 1px solid var(--border);
+            color: var(--text-muted);
+            font-size: 0.85rem;
+        }
+        @media (max-width: 768px) {
+            .sidebar { display: none; }
+            .main { margin-left: 0; padding: 1.5rem; }
+        }
+    </style>
+</head>
+<body>
+
+<nav class="sidebar">
+    <div class="sidebar-title">PostgreSQL Privileges</div>
+    <div class="section-label">Foundations</div>
+    <a href="#roles-vs-users">1. Roles vs Users</a>
+    <a href="#role-attributes">2. Role Attributes</a>
+    <a href="#public-role">3. The PUBLIC Role</a>
+    <a href="#inherit">4. INHERIT vs NOINHERIT</a>
+    <div class="section-label">Privilege Levels</div>
+    <a href="#privilege-chain">5. The Privilege Chain</a>
+    <a href="#database-privs">6. Database Privileges</a>
+    <a href="#schema-privs">7. Schema Privileges</a>
+    <a href="#table-privs">8. Table Privileges</a>
+    <a href="#column-privs">9. Column Privileges</a>
+    <a href="#sequence-privs">10. Sequence Privileges</a>
+    <a href="#function-privs">11. Function Privileges</a>
+    <div class="section-label">Advanced</div>
+    <a href="#builtin-roles">12. Built-in Roles</a>
+    <a href="#default-privs">13. Default Privileges</a>
+    <a href="#rls">14. Row-Level Security</a>
+    <a href="#inspect">15. Inspecting Privileges</a>
+    <div class="section-label">Reference</div>
+    <a href="#recipes">16. Common Recipes</a>
+    <a href="#best-practices">17. Best Practices</a>
+</nav>
+
+<main class="main">
+    <h1>PostgreSQL Access &amp; Privileges</h1>
+    <p class="subtitle">A comprehensive guide to roles, grants, schemas, and security in PostgreSQL 14–16</p>
+
+    <!-- ===== 1. ROLES VS USERS ===== -->
+    <span class="section-anchor" id="roles-vs-users"></span>
+    <h2>1. Roles vs Users</h2>
+    <p>In PostgreSQL, <strong>there is no real difference between a role and a user</strong>. A <code>USER</code> is simply a <code>ROLE</code> that has the <code>LOGIN</code> attribute. Both are managed with the same commands internally.</p>
+    <pre><code><span class="cmt">-- These two are exactly equivalent</span>
+<span class="kw">CREATE USER</span> alice <span class="kw">WITH PASSWORD</span> <span class="str">'secret'</span>;
+<span class="cmt">-- is the same as:</span>
+<span class="kw">CREATE ROLE</span> alice <span class="kw">WITH LOGIN PASSWORD</span> <span class="str">'secret'</span>;</code></pre>
+
+    <p>Roles can:</p>
+    <ul>
+        <li>Log in to the database (if they have <code>LOGIN</code>)</li>
+        <li>Own database objects (tables, schemas, functions, etc.)</li>
+        <li>Be granted privileges on objects</li>
+        <li>Be members of other roles (acting as groups)</li>
+        <li>Inherit privileges from roles they belong to (if <code>INHERIT</code>)</li>
+    </ul>
+
+    <div class="hierarchy">
+        <div class="hl-0">ROLE — base concept (no LOGIN by default)</div>
+        <div class="hl-1">├── Group Role — used to bundle permissions, no login</div>
+        <div class="hl-2">└── User Role — has LOGIN, can connect</div>
+        <div class="hl-3">└── Can be MEMBER of group roles → inherits their privileges</div>
+    </div>
+
+    <!-- ===== 2. ROLE ATTRIBUTES ===== -->
+    <span class="section-anchor" id="role-attributes"></span>
+    <h2>2. Role Attributes</h2>
+    <p>Role attributes define what the role is allowed to do at the <strong>system level</strong> — not what database objects it can access. These are configured at creation or with <code>ALTER ROLE</code>.</p>
+
+    <table>
+        <thead><tr><th>Attribute</th><th>Default</th><th>What it controls</th></tr></thead>
+        <tbody>
+            <tr><td><code>LOGIN</code> / <code>NOLOGIN</code></td><td>NOLOGIN</td><td>Can the role connect to the database server?</td></tr>
+            <tr><td><code>SUPERUSER</code> / <code>NOSUPERUSER</code></td><td>NOSUPERUSER</td><td>Bypasses ALL access checks. Extremely dangerous to hand out.</td></tr>
+            <tr><td><code>CREATEDB</code> / <code>NOCREATEDB</code></td><td>NOCREATEDB</td><td>Can the role create new databases?</td></tr>
+            <tr><td><code>CREATEROLE</code> / <code>NOCREATEROLE</code></td><td>NOCREATEROLE</td><td>Can the role create, alter, or drop other roles?</td></tr>
+            <tr><td><code>INHERIT</code> / <code>NOINHERIT</code></td><td>INHERIT</td><td>Does the role automatically inherit privileges from roles it belongs to?</td></tr>
+            <tr><td><code>REPLICATION</code> / <code>NOREPLICATION</code></td><td>NOREPLICATION</td><td>Can the role initiate streaming replication?</td></tr>
+            <tr><td><code>BYPASSRLS</code> / <code>NOBYPASSRLS</code></td><td>NOBYPASSRLS</td><td>Can the role bypass Row-Level Security policies?</td></tr>
+            <tr><td><code>CONNECTION LIMIT n</code></td><td>-1 (unlimited)</td><td>Maximum concurrent connections for this role.</td></tr>
+            <tr><td><code>PASSWORD</code></td><td>null</td><td>Login password (stored hashed).</td></tr>
+            <tr><td><code>VALID UNTIL</code></td><td>never expires</td><td>Password expiry timestamp.</td></tr>
+        </tbody>
+    </table>
+
+    <div class="callout warning">
+        <div class="callout-title">⚠️ Critical Misconception</div>
+        Attributes like <code>NOSUPERUSER</code>, <code>NOCREATEDB</code>, <code>NOCREATEROLE</code> only restrict system-level operations.
+        They have <strong>zero effect</strong> on access to tables, schemas, or other database objects.
+        Object access is controlled entirely by <code>GRANT</code> and <code>REVOKE</code>.
+    </div>
+
+    <pre><code><span class="cmt">-- Modify attributes after creation</span>
+<span class="kw">ALTER ROLE</span> alice <span class="kw">CREATEDB</span>;
+<span class="kw">ALTER ROLE</span> alice <span class="kw">CONNECTION LIMIT</span> <span class="num">10</span>;
+<span class="kw">ALTER ROLE</span> alice <span class="kw">VALID UNTIL</span> <span class="str">'2025-12-31'</span>;
+<span class="kw">ALTER ROLE</span> alice <span class="kw">NOLOGIN</span>;          <span class="cmt">-- demote to a group role</span>
+<span class="kw">ALTER ROLE</span> alice <span class="kw">PASSWORD</span> <span class="str">'newpass'</span>;
+<span class="kw">ALTER ROLE</span> alice <span class="kw">RENAME TO</span> alice_old;</code></pre>
+
+    <!-- ===== 3. THE PUBLIC ROLE ===== -->
+    <span class="section-anchor" id="public-role"></span>
+    <h2>3. The PUBLIC Role</h2>
+    <p><code>PUBLIC</code> is a special built-in pseudo-role. <strong>Every role automatically belongs to PUBLIC</strong>, and any privilege granted to <code>PUBLIC</code> applies to all current and future users in the cluster.</p>
+
+    <div class="callout danger">
+        <div class="callout-title">🚨 PostgreSQL's Permissive Defaults — Granted to PUBLIC Out of the Box</div>
+        <ul>
+            <li><code>CONNECT</code> on all databases → every user can connect to every database</li>
+            <li><code>TEMP</code> on all databases → every user can create temporary tables</li>
+            <li><code>CREATE</code> on the <code>public</code> schema → every user can create tables</li>
+            <li><code>USAGE</code> on the <code>public</code> schema → every user can see objects in it</li>
+            <li><code>EXECUTE</code> on all functions → every user can call all functions</li>
+        </ul>
+        This is why simply setting restrictive role attributes is not enough — you must also <code>REVOKE</code> from <code>PUBLIC</code>.
+    </div>
+
+    <h3>Verifying what PUBLIC has</h3>
+    <pre><code><span class="cmt">-- Check database-level privileges (look for "=" entries = PUBLIC)</span>
+\<span class="fn">l</span> your_database
+
+<span class="cmt">-- Check schema-level privileges</span>
+\<span class="fn">dn+</span> public
+
+<span class="cmt">-- In the output:
+--   =  (before the slash) means PUBLIC
+--   C  = CREATE
+--   U  = USAGE
+--   T  = TEMP (on database)
+--   c  = CONNECT (on database)
+-- Example: =UC means PUBLIC has USAGE and CREATE on the schema</span></code></pre>
+
+    <h3>Locking down PUBLIC (recommended for production)</h3>
+    <pre><code><span class="cmt">-- Prevent all users from connecting without explicit grant</span>
+<span class="kw">REVOKE CONNECT ON DATABASE</span> mydb <span class="kw">FROM PUBLIC</span>;
+
+<span class="cmt">-- Prevent all users from creating tables (most important)</span>
+<span class="kw">REVOKE CREATE ON SCHEMA</span> public <span class="kw">FROM PUBLIC</span>;
+
+<span class="cmt">-- Prevent temp table creation (optional, stricter)</span>
+<span class="kw">REVOKE TEMP ON DATABASE</span> mydb <span class="kw">FROM PUBLIC</span>;
+
+<span class="cmt">-- Prevent calling all functions (optional, strictest)</span>
+<span class="kw">REVOKE EXECUTE ON ALL FUNCTIONS IN SCHEMA</span> public <span class="kw">FROM PUBLIC</span>;</code></pre>
+
+    <!-- ===== 4. INHERIT VS NOINHERIT ===== -->
+    <span class="section-anchor" id="inherit"></span>
+    <h2>4. INHERIT vs NOINHERIT</h2>
+    <p>When a role is a <strong>member of another role</strong>, the <code>INHERIT</code> attribute controls whether its privileges are automatically applied.</p>
+
+    <table>
+        <thead><tr><th>Setting</th><th>Behavior</th></tr></thead>
+        <tbody>
+            <tr>
+                <td><code>INHERIT</code> <span class="badge badge-green">Default</span></td>
+                <td>Privileges from all member roles are automatically active. The user can use them immediately without any extra step.</td>
+            </tr>
+            <tr>
+                <td><code>NOINHERIT</code></td>
+                <td>Privileges from member roles are NOT active automatically. The user must run <code>SET ROLE role_name</code> to explicitly activate them.</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <pre><code><span class="cmt">-- Setup a group role with SELECT</span>
+<span class="kw">CREATE ROLE</span> readers;
+<span class="kw">GRANT SELECT ON ALL TABLES IN SCHEMA</span> public <span class="kw">TO</span> readers;
+
+<span class="cmt">-- alice has INHERIT (default): privileges work immediately</span>
+<span class="kw">CREATE USER</span> alice <span class="kw">WITH LOGIN PASSWORD</span> <span class="str">'pass'</span>;  <span class="cmt">-- INHERIT is default</span>
+<span class="kw">GRANT</span> readers <span class="kw">TO</span> alice;
+<span class="cmt">-- alice can SELECT right away ✓</span>
+
+<span class="cmt">-- bob has NOINHERIT: must SET ROLE first</span>
+<span class="kw">CREATE USER</span> bob <span class="kw">WITH LOGIN PASSWORD</span> <span class="str">'pass'</span> <span class="kw">NOINHERIT</span>;
+<span class="kw">GRANT</span> readers <span class="kw">TO</span> bob;
+<span class="cmt">-- bob gets "permission denied" here ✗</span>
+<span class="kw">SELECT</span> <span class="op">*</span> <span class="kw">FROM</span> orders;
+
+<span class="cmt">-- bob must explicitly switch into the role</span>
+<span class="kw">SET ROLE</span> readers;
+<span class="kw">SELECT</span> <span class="op">*</span> <span class="kw">FROM</span> orders; <span class="cmt">-- now works ✓</span>
+<span class="kw">RESET ROLE</span>;           <span class="cmt">-- back to bob's own privileges</span>
+
+<span class="cmt">-- Fix bob to use INHERIT instead</span>
+<span class="kw">ALTER USER</span> bob <span class="kw">INHERIT</span>;</code></pre>
+
+    <div class="callout info">
+        <div class="callout-title">ℹ️ When is NOINHERIT useful?</div>
+        <code>NOINHERIT</code> is sometimes used for high-privilege roles (like a DBA role) where you want the user to <em>consciously</em> switch into elevated permissions — similar to <code>sudo</code> in Linux. For regular app users, always use <code>INHERIT</code>.
+    </div>
+
+    <!-- ===== 5. PRIVILEGE CHAIN ===== -->
+    <span class="section-anchor" id="privilege-chain"></span>
+    <h2>5. The Privilege Check Chain</h2>
+    <p>PostgreSQL checks privileges at <strong>every level</strong>. A grant at one level does not bypass checks at others. You must satisfy all levels in the chain.</p>
+
+    <div class="hierarchy">
+        <div class="hl-0">Step 1 — Can the role CONNECT to the database?</div>
+        <div class="hl-1">↓ yes → continue / no → "FATAL: role not permitted to log in"</div>
+        <div class="hl-0">Step 2 — Does the role have USAGE on the schema?</div>
+        <div class="hl-1">↓ yes → continue / no → "ERROR: permission denied for schema"</div>
+        <div class="hl-0">Step 3 — Does the role have SELECT/INSERT/... on the table?</div>
+        <div class="hl-1">↓ yes → continue / no → "ERROR: permission denied for table"</div>
+        <div class="hl-0">Step 4 (if RLS) — Does a row-level policy allow this row?</div>
+        <div class="hl-1">↓ yes → ✓ query succeeds / no → row is silently filtered or blocked</div>
+    </div>
+
+    <div class="callout warning">
+        <div class="callout-title">⚠️ Common Mistake</div>
+        Granting <code>SELECT ON TABLE orders</code> means nothing if the user doesn't also have <code>USAGE ON SCHEMA public</code>. You always need both.
+    </div>
+
+    <!-- ===== 6. DATABASE PRIVILEGES ===== -->
+    <span class="section-anchor" id="database-privs"></span>
+    <h2>6. Database-Level Privileges</h2>
+    <p>These control access at the database level, granted with <code>GRANT ... ON DATABASE</code>.</p>
+
+    <table>
+        <thead><tr><th>Privilege</th><th>What it allows</th><th>Default</th></tr></thead>
+        <tbody>
+            <tr><td><code>CONNECT</code></td><td>Connect to the database.</td><td>Granted to PUBLIC</td></tr>
+            <tr><td><code>CREATE</code></td><td>Create new schemas within the database.</td><td>Not granted</td></tr>
+            <tr><td><code>TEMP</code> / <code>TEMPORARY</code></td><td>Create temporary tables in the database.</td><td>Granted to PUBLIC</td></tr>
+        </tbody>
+    </table>
+
+    <pre><code><span class="kw">GRANT CONNECT ON DATABASE</span> mydb <span class="kw">TO</span> alice;
+<span class="kw">GRANT CREATE ON DATABASE</span> mydb <span class="kw">TO</span> alice;    <span class="cmt">-- allows creating new schemas</span>
+<span class="kw">GRANT TEMP ON DATABASE</span> mydb <span class="kw">TO</span> alice;      <span class="cmt">-- allows temporary tables</span>
+<span class="kw">GRANT ALL ON DATABASE</span> mydb <span class="kw">TO</span> admin_user;  <span class="cmt">-- all of the above</span>
+
+<span class="kw">REVOKE ALL ON DATABASE</span> mydb <span class="kw">FROM</span> alice;    <span class="cmt">-- remove everything</span></code></pre>
+
+    <!-- ===== 7. SCHEMA PRIVILEGES ===== -->
+    <span class="section-anchor" id="schema-privs"></span>
+    <h2>7. Schema-Level Privileges</h2>
+    <p>Schemas are namespaces inside a database. You need schema privileges before you can access any objects within a schema.</p>
+
+    <table>
+        <thead><tr><th>Privilege</th><th>What it allows</th><th>Default</th></tr></thead>
+        <tbody>
+            <tr><td><code>USAGE</code></td><td>Look up and access objects in the schema. Required to query any table in the schema.</td><td>Granted to PUBLIC on <code>public</code></td></tr>
+            <tr><td><code>CREATE</code></td><td>Create new objects (tables, views, functions, sequences) in the schema.</td><td>Granted to PUBLIC on <code>public</code></td></tr>
+        </tbody>
+    </table>
+
+    <pre><code><span class="kw">GRANT USAGE ON SCHEMA</span> public <span class="kw">TO</span> alice;     <span class="cmt">-- can use objects in schema</span>
+<span class="kw">GRANT CREATE ON SCHEMA</span> public <span class="kw">TO</span> alice;    <span class="cmt">-- can create tables/views etc.</span>
+<span class="kw">GRANT USAGE, CREATE ON SCHEMA</span> public <span class="kw">TO</span> alice;
+
+<span class="cmt">-- Revoke CREATE from everyone (critical for production lockdown)</span>
+<span class="kw">REVOKE CREATE ON SCHEMA</span> public <span class="kw">FROM PUBLIC</span>;
+
+<span class="cmt">-- Create a private schema only certain roles can access</span>
+<span class="kw">CREATE SCHEMA</span> private;
+<span class="kw">REVOKE ALL ON SCHEMA</span> private <span class="kw">FROM PUBLIC</span>;
+<span class="kw">GRANT USAGE ON SCHEMA</span> private <span class="kw">TO</span> trusted_role;</code></pre>
+
+    <!-- ===== 8. TABLE PRIVILEGES ===== -->
+    <span class="section-anchor" id="table-privs"></span>
+    <h2>8. Table &amp; View Privileges</h2>
+
+    <table>
+        <thead><tr><th>Privilege</th><th>What it allows</th></tr></thead>
+        <tbody>
+            <tr><td><code>SELECT</code></td><td>Read rows. Also required in practice for UPDATE and DELETE (to identify rows).</td></tr>
+            <tr><td><code>INSERT</code></td><td>Add new rows.</td></tr>
+            <tr><td><code>UPDATE</code></td><td>Modify existing rows.</td></tr>
+            <tr><td><code>DELETE</code></td><td>Remove rows.</td></tr>
+            <tr><td><code>TRUNCATE</code></td><td>Delete all rows instantly without a WHERE clause.</td></tr>
+            <tr><td><code>REFERENCES</code></td><td>Create foreign key constraints that reference this table.</td></tr>
+            <tr><td><code>TRIGGER</code></td><td>Create triggers on this table.</td></tr>
+            <tr><td><code>ALL PRIVILEGES</code></td><td>Grants all of the above in one statement.</td></tr>
+        </tbody>
+    </table>
+
+    <pre><code><span class="cmt">-- Single table grants</span>
+<span class="kw">GRANT SELECT ON</span> orders <span class="kw">TO</span> alice;
+<span class="kw">GRANT SELECT, INSERT, UPDATE, DELETE ON</span> orders <span class="kw">TO</span> app_user;
+<span class="kw">GRANT ALL PRIVILEGES ON</span> orders <span class="kw">TO</span> admin_user;
+
+<span class="cmt">-- Grant on all currently existing tables in a schema</span>
+<span class="kw">GRANT SELECT ON ALL TABLES IN SCHEMA</span> public <span class="kw">TO</span> alice;
+
+<span class="cmt">-- Revoke a specific privilege</span>
+<span class="kw">REVOKE INSERT ON</span> orders <span class="kw">FROM</span> alice;
+
+<span class="cmt">-- Grant WITH GRANT OPTION: allows alice to grant this to others</span>
+<span class="kw">GRANT SELECT ON</span> orders <span class="kw">TO</span> alice <span class="kw">WITH GRANT OPTION</span>;</code></pre>
+
+    <div class="callout info">
+        <div class="callout-title">ℹ️ Views and Privileges</div>
+        Views follow the same model as tables. A user only needs <code>SELECT</code> on the view itself — not on the underlying tables. The view executes with the <strong>owner's</strong> privileges (unless created with <code>security_invoker = true</code>).
+        This makes views a powerful tool for controlled data exposure.
+    </div>
+
+    <!-- ===== 9. COLUMN PRIVILEGES ===== -->
+    <span class="section-anchor" id="column-privs"></span>
+    <h2>9. Column-Level Privileges</h2>
+    <p><code>SELECT</code>, <code>INSERT</code>, <code>UPDATE</code>, and <code>REFERENCES</code> can be granted at the column level for fine-grained access control.</p>
+
+    <pre><code><span class="cmt">-- Allow alice to only read name and email columns</span>
+<span class="kw">GRANT SELECT</span> (name, email) <span class="kw">ON</span> users <span class="kw">TO</span> alice;
+
+<span class="cmt">-- Allow bob to update only the status column</span>
+<span class="kw">GRANT UPDATE</span> (status) <span class="kw">ON</span> orders <span class="kw">TO</span> bob;
+
+<span class="cmt">-- Verify column-level grants</span>
+<span class="kw">SELECT</span> grantee, table_name, column_name, privilege_type
+<span class="kw">FROM</span> information_schema.column_privileges
+<span class="kw">WHERE</span> grantee <span class="op">=</span> <span class="str">'alice'</span>;</code></pre>
+
+    <div class="callout tip">
+        <div class="callout-title">💡 Tip</div>
+        Column-level grants are an alternative to creating views when you want to hide sensitive columns like
+        <code>password_hash</code>, <code>ssn</code>, or <code>credit_card_number</code> from certain users without the overhead of maintaining separate view definitions.
+    </div>
+
+    <!-- ===== 10. SEQUENCE PRIVILEGES ===== -->
+    <span class="section-anchor" id="sequence-privs"></span>
+    <h2>10. Sequence Privileges</h2>
+    <p>Sequences (used by <code>SERIAL</code> and <code>IDENTITY</code> columns) have their own privilege set. If an app user needs to INSERT into a table with an auto-increment ID, they also need sequence access.</p>
+
+    <table>
+        <thead><tr><th>Privilege</th><th>What it allows</th></tr></thead>
+        <tbody>
+            <tr><td><code>USAGE</code></td><td>Call <code>nextval()</code> and <code>currval()</code>. Required for INSERT on tables with serial/identity columns.</td></tr>
+            <tr><td><code>SELECT</code></td><td>Call <code>currval()</code> only (read current value without advancing).</td></tr>
+            <tr><td><code>UPDATE</code></td><td>Call <code>nextval()</code>, <code>setval()</code> (advance or reset the sequence).</td></tr>
+        </tbody>
+    </table>
+
+    <pre><code><span class="cmt">-- App user inserting rows needs USAGE on sequences</span>
+<span class="kw">GRANT USAGE ON ALL SEQUENCES IN SCHEMA</span> public <span class="kw">TO</span> app_user;
+
+<span class="cmt">-- Read-only user typically only needs SELECT on sequences</span>
+<span class="kw">GRANT SELECT ON ALL SEQUENCES IN SCHEMA</span> public <span class="kw">TO</span> readonly_user;
+
+<span class="cmt">-- Grant on a specific sequence</span>
+<span class="kw">GRANT USAGE ON SEQUENCE</span> orders_id_seq <span class="kw">TO</span> app_user;</code></pre>
+
+    <!-- ===== 11. FUNCTION PRIVILEGES ===== -->
+    <span class="section-anchor" id="function-privs"></span>
+    <h2>11. Function &amp; Procedure Privileges</h2>
+
+    <table>
+        <thead><tr><th>Privilege</th><th>What it allows</th><th>Default</th></tr></thead>
+        <tbody>
+            <tr><td><code>EXECUTE</code></td><td>Call the function or stored procedure.</td><td>Granted to PUBLIC</td></tr>
+        </tbody>
+    </table>
+
+    <pre><code><span class="kw">GRANT EXECUTE ON FUNCTION</span> calculate_tax(<span class="typ">numeric</span>) <span class="kw">TO</span> app_user;
+<span class="kw">GRANT EXECUTE ON ALL FUNCTIONS IN SCHEMA</span> public <span class="kw">TO</span> app_user;
+
+<span class="cmt">-- Lock down sensitive functions (override PUBLIC default)</span>
+<span class="kw">REVOKE EXECUTE ON FUNCTION</span> admin_reset_all_passwords() <span class="kw">FROM PUBLIC</span>;</code></pre>
+
+    <h3>Security Definer vs Security Invoker</h3>
+    <p>Functions can run under two different privilege models:</p>
+
+    <table>
+        <thead><tr><th>Mode</th><th>Runs with privileges of</th><th>Use case</th></tr></thead>
+        <tbody>
+            <tr><td><code>SECURITY INVOKER</code> <span class="badge badge-green">Default</span></td><td>The <strong>caller</strong></td><td>Most functions — caller's privileges apply</td></tr>
+            <tr><td><code>SECURITY DEFINER</code></td><td>The function <strong>owner</strong></td><td>Controlled elevation — caller can do things the owner can, but only through this function</td></tr>
+        </tbody>
+    </table>
+
+    <pre><code><span class="cmt">-- SECURITY DEFINER: function runs as owner, not caller</span>
+<span class="cmt">-- Useful for allowing users to do one specific elevated operation</span>
+<span class="kw">CREATE OR REPLACE FUNCTION</span> get_all_orders()
+<span class="kw">RETURNS SETOF</span> orders
+<span class="kw">LANGUAGE</span> sql
+<span class="kw">SECURITY DEFINER</span>
+<span class="kw">SET search_path =</span> public  <span class="cmt">-- always set this with SECURITY DEFINER!</span>
+<span class="kw">AS</span> <span class="str">$$
+    SELECT * FROM orders;
+$$</span>;</code></pre>
+
+    <!-- ===== 12. BUILT-IN ROLES ===== -->
+    <span class="section-anchor" id="builtin-roles"></span>
+    <h2>12. Built-in Predefined Roles (PG 10+)</h2>
+    <p>PostgreSQL ships with several predefined roles. These are especially convenient on managed databases (like Azure, RDS) where you don't have superuser access.</p>
+
+    <table>
+        <thead><tr><th>Role</th><th>What it grants</th><th>Since</th></tr></thead>
+        <tbody>
+            <tr><td><code>pg_read_all_data</code></td><td><code>SELECT</code> on all tables, views, sequences across all schemas. Automatically covers future objects.</td><td>PG 14</td></tr>
+            <tr><td><code>pg_write_all_data</code></td><td><code>INSERT</code>, <code>UPDATE</code>, <code>DELETE</code> on all tables and views across all schemas.</td><td>PG 14</td></tr>
+            <tr><td><code>pg_monitor</code></td><td>Full monitoring access: read stats, configuration, query text, etc. Includes the roles below.</td><td>PG 10</td></tr>
+            <tr><td><code>pg_read_all_settings</code></td><td>Read all configuration parameters (including those normally restricted).</td><td>PG 10</td></tr>
+            <tr><td><code>pg_read_all_stats</code></td><td>Read all <code>pg_stat_*</code> views, including query text from <code>pg_stat_activity</code>.</td><td>PG 10</td></tr>
+            <tr><td><code>pg_stat_scan_tables</code></td><td>Execute <code>ANALYZE</code> on all tables to update statistics.</td><td>PG 10</td></tr>
+            <tr><td><code>pg_signal_backend</code></td><td>Send signals to backends: cancel queries (<code>pg_cancel_backend</code>), terminate sessions (<code>pg_terminate_backend</code>).</td><td>PG 9.6</td></tr>
+            <tr><td><code>pg_checkpoint</code></td><td>Execute <code>CHECKPOINT</code> command.</td><td>PG 15</td></tr>
+            <tr><td><code>pg_read_server_files</code></td><td>Read files on the server filesystem (<code>COPY FROM</code>, <code>pg_read_file()</code>).</td><td>PG 11</td></tr>
+            <tr><td><code>pg_write_server_files</code></td><td>Write files on the server filesystem (<code>COPY TO</code>).</td><td>PG 11</td></tr>
+        </tbody>
+    </table>
+
+    <pre><code><span class="cmt">-- Grant full read-only access to all tables/views in all schemas</span>
+<span class="kw">GRANT</span> pg_read_all_data <span class="kw">TO</span> readonly_user;
+
+<span class="cmt">-- Grant write access everywhere (use sparingly)</span>
+<span class="kw">GRANT</span> pg_write_all_data <span class="kw">TO</span> app_user;
+
+<span class="cmt">-- Grant monitoring access (for tools like pgBadger, Datadog)</span>
+<span class="kw">GRANT</span> pg_monitor <span class="kw">TO</span> monitoring_user;</code></pre>
+
+    <div class="callout warning">
+        <div class="callout-title">⚠️ Remember: INHERIT is required</div>
+        These built-in roles only work if the user has <code>INHERIT</code> (which is the default).
+        If the user was created with <code>NOINHERIT</code>, they must run <code>SET ROLE pg_read_all_data</code> before the privileges take effect.
+    </div>
+
+    <!-- ===== 13. DEFAULT PRIVILEGES ===== -->
+    <span class="section-anchor" id="default-privs"></span>
+    <h2>13. Default Privileges</h2>
+    <p><code>GRANT ON ALL TABLES IN SCHEMA</code> only covers <strong>already-existing</strong> objects. Tables created in the future won't inherit those grants. <code>ALTER DEFAULT PRIVILEGES</code> fixes this.</p>
+
+    <pre><code><span class="cmt">-- Grant SELECT on all FUTURE tables that migration_user creates in public schema</span>
+<span class="kw">ALTER DEFAULT PRIVILEGES
+    FOR ROLE</span> migration_user
+    <span class="kw">IN SCHEMA</span> public
+    <span class="kw">GRANT SELECT ON TABLES TO</span> readonly_user;
+
+<span class="cmt">-- Grant INSERT/UPDATE/DELETE on all FUTURE tables</span>
+<span class="kw">ALTER DEFAULT PRIVILEGES
+    FOR ROLE</span> migration_user
+    <span class="kw">IN SCHEMA</span> public
+    <span class="kw">GRANT INSERT, UPDATE, DELETE ON TABLES TO</span> app_user;
+
+<span class="cmt">-- Grant USAGE on all FUTURE sequences (needed for INSERT with serial columns)</span>
+<span class="kw">ALTER DEFAULT PRIVILEGES
+    FOR ROLE</span> migration_user
+    <span class="kw">IN SCHEMA</span> public
+    <span class="kw">GRANT USAGE ON SEQUENCES TO</span> app_user;
+
+<span class="cmt">-- Grant EXECUTE on all FUTURE functions</span>
+<span class="kw">ALTER DEFAULT PRIVILEGES
+    FOR ROLE</span> migration_user
+    <span class="kw">IN SCHEMA</span> public
+    <span class="kw">GRANT EXECUTE ON FUNCTIONS TO</span> app_user;
+
+<span class="cmt">-- View current default privilege configuration</span>
+\<span class="fn">ddp</span>
+
+<span class="cmt">-- Remove a default privilege setting</span>
+<span class="kw">ALTER DEFAULT PRIVILEGES
+    FOR ROLE</span> migration_user
+    <span class="kw">IN SCHEMA</span> public
+    <span class="kw">REVOKE SELECT ON TABLES FROM</span> readonly_user;</code></pre>
+
+    <div class="callout info">
+        <div class="callout-title">ℹ️ FOR ROLE explained</div>
+        <code>FOR ROLE migration_user</code> means: "apply these defaults when objects are created <em>by</em> migration_user".
+        If you run migrations as the admin user, use <code>FOR ROLE admin_user</code>.
+        If <code>FOR ROLE</code> is omitted, it defaults to the current executing user.
+    </div>
+
+    <!-- ===== 14. ROW LEVEL SECURITY ===== -->
+    <span class="section-anchor" id="rls"></span>
+    <h2>14. Row-Level Security (RLS)</h2>
+    <p>RLS allows you to restrict which <em>individual rows</em> a user can see or modify — even when they have full <code>SELECT</code> on the table. Essential for multi-tenant applications.</p>
+
+    <pre><code><span class="cmt">-- Step 1: Enable RLS on the table</span>
+<span class="kw">ALTER TABLE</span> orders <span class="kw">ENABLE ROW LEVEL SECURITY</span>;
+
+<span class="cmt">-- Step 2: Create a policy</span>
+<span class="cmt">-- USING = filter for SELECT/UPDATE/DELETE</span>
+<span class="cmt">-- WITH CHECK = filter for INSERT/UPDATE (new row must satisfy this)</span>
+<span class="kw">CREATE POLICY</span> tenant_isolation <span class="kw">ON</span> orders
+    <span class="kw">USING</span> (tenant_id <span class="op">=</span> current_setting(<span class="str">'app.tenant_id'</span>)<span class="op">::</span><span class="typ">int</span>);
+
+<span class="cmt">-- Step 3: In your app, set the context before querying</span>
+<span class="kw">SET</span> app.tenant_id <span class="op">=</span> <span class="str">'42'</span>;
+<span class="kw">SELECT</span> <span class="op">*</span> <span class="kw">FROM</span> orders; <span class="cmt">-- silently returns only tenant 42's rows</span></code></pre>
+
+    <h3>Separate read and write policies</h3>
+    <pre><code><span class="cmt">-- Read policy: users see only their own rows</span>
+<span class="kw">CREATE POLICY</span> select_own_orders <span class="kw">ON</span> orders
+    <span class="kw">FOR SELECT</span>
+    <span class="kw">USING</span> (user_id <span class="op">=</span> <span class="fn">current_setting</span>(<span class="str">'app.current_user_id'</span>)<span class="op">::</span><span class="typ">int</span>);
+
+<span class="cmt">-- Insert policy: users can only insert rows for themselves</span>
+<span class="kw">CREATE POLICY</span> insert_own_orders <span class="kw">ON</span> orders
+    <span class="kw">FOR INSERT</span>
+    <span class="kw">WITH CHECK</span> (user_id <span class="op">=</span> <span class="fn">current_setting</span>(<span class="str">'app.current_user_id'</span>)<span class="op">::</span><span class="typ">int</span>);
+
+<span class="cmt">-- Admins bypass all RLS (policy that always returns true for admins)</span>
+<span class="kw">CREATE POLICY</span> admin_all <span class="kw">ON</span> orders
+    <span class="kw">USING</span> (<span class="fn">current_setting</span>(<span class="str">'app.role'</span>) <span class="op">=</span> <span class="str">'admin'</span>);
+
+<span class="cmt">-- Drop a policy</span>
+<span class="kw">DROP POLICY</span> select_own_orders <span class="kw">ON</span> orders;
+
+<span class="cmt">-- Disable RLS entirely</span>
+<span class="kw">ALTER TABLE</span> orders <span class="kw">DISABLE ROW LEVEL SECURITY</span>;</code></pre>
+
+    <div class="callout warning">
+        <div class="callout-title">⚠️ Table Owners Bypass RLS by Default</div>
+        The table owner and superusers bypass all RLS policies. To enforce RLS even on the owner, use:
+        <br><code>ALTER TABLE orders FORCE ROW LEVEL SECURITY;</code><br>
+        Superusers always bypass RLS unless their role has <code>NOBYPASSRLS</code>.
+    </div>
+
+    <!-- ===== 15. INSPECTING PRIVILEGES ===== -->
+    <span class="section-anchor" id="inspect"></span>
+    <h2>15. Inspecting Privileges</h2>
+
+    <h3>psql meta-commands</h3>
+    <table>
+        <thead><tr><th>Command</th><th>What it shows</th></tr></thead>
+        <tbody>
+            <tr><td><code>\du</code> or <code>\du+</code></td><td>All roles and their system attributes</td></tr>
+            <tr><td><code>\l</code> or <code>\l+</code></td><td>All databases and their access privileges</td></tr>
+            <tr><td><code>\dn+</code></td><td>All schemas and their access privileges</td></tr>
+            <tr><td><code>\dp tablename</code></td><td>Privileges on a specific table/view/sequence</td></tr>
+            <tr><td><code>\dp</code></td><td>All table/view/sequence privileges in current schema</td></tr>
+            <tr><td><code>\ddp</code></td><td>Default privilege configuration</td></tr>
+            <tr><td><code>\df+ funcname</code></td><td>Function definition including security mode and privileges</td></tr>
+        </tbody>
+    </table>
+
+    <h3>SQL queries</h3>
+    <pre><code><span class="cmt">-- All table privileges for a specific user</span>
+<span class="kw">SELECT</span> grantee, table_schema, table_name, privilege_type
+<span class="kw">FROM</span> information_schema.role_table_grants
+<span class="kw">WHERE</span> grantee <span class="op">=</span> <span class="str">'alice'</span>;
+
+<span class="cmt">-- All roles a user is a member of</span>
+<span class="kw">SELECT</span> r.rolname
+<span class="kw">FROM</span> pg_roles r
+<span class="kw">JOIN</span> pg_auth_members m <span class="kw">ON</span> r.oid <span class="op">=</span> m.roleid
+<span class="kw">JOIN</span> pg_roles u <span class="kw">ON</span> u.oid <span class="op">=</span> m.member
+<span class="kw">WHERE</span> u.rolname <span class="op">=</span> <span class="str">'alice'</span>;
+
+<span class="cmt">-- All objects owned by a specific role</span>
+<span class="kw">SELECT</span> relname, relkind
+<span class="kw">FROM</span> pg_class
+<span class="kw">WHERE</span> relowner <span class="op">=</span> <span class="str">'alice'</span><span class="op">::</span>regrole;
+
+<span class="cmt">-- Programmatically check effective privileges</span>
+<span class="kw">SELECT</span> <span class="fn">has_table_privilege</span>(<span class="str">'alice'</span>, <span class="str">'orders'</span>, <span class="str">'SELECT'</span>);    <span class="cmt">-- → true/false</span>
+<span class="kw">SELECT</span> <span class="fn">has_schema_privilege</span>(<span class="str">'alice'</span>, <span class="str">'public'</span>, <span class="str">'USAGE'</span>);   <span class="cmt">-- → true/false</span>
+<span class="kw">SELECT</span> <span class="fn">has_database_privilege</span>(<span class="str">'alice'</span>, <span class="str">'mydb'</span>, <span class="str">'CONNECT'</span>); <span class="cmt">-- → true/false</span>
+
+<span class="cmt">-- View all RLS policies</span>
+<span class="kw">SELECT</span> schemaname, tablename, policyname, roles, cmd, qual
+<span class="kw">FROM</span> pg_policies;
+
+<span class="cmt">-- Find all non-default privileges (useful for auditing)</span>
+<span class="kw">SELECT</span> <span class="op">*</span> <span class="kw">FROM</span> information_schema.role_table_grants
+<span class="kw">WHERE</span> grantee <span class="op">!=</span> <span class="str">'PUBLIC'</span> <span class="kw">AND</span> grantee <span class="op">!=</span> table_schema;</code></pre>
+
+    <!-- ===== 16. COMMON RECIPES ===== -->
+    <span class="section-anchor" id="recipes"></span>
+    <h2>16. Common Recipes</h2>
+
+    <h3>✅ Minimal Read-Only User (PG 14+)</h3>
+    <pre><code><span class="kw">CREATE USER</span> readonly_user <span class="kw">WITH LOGIN PASSWORD</span> <span class="str">'strong_password'</span>;
+<span class="kw">GRANT CONNECT ON DATABASE</span> mydb <span class="kw">TO</span> readonly_user;
+<span class="kw">GRANT</span> pg_read_all_data <span class="kw">TO</span> readonly_user;
+<span class="kw">REVOKE CREATE ON SCHEMA</span> public <span class="kw">FROM PUBLIC</span>; <span class="cmt">-- prevent table creation</span></code></pre>
+
+    <h3>✅ App User (CRUD, no DDL)</h3>
+    <pre><code><span class="kw">CREATE USER</span> app_user <span class="kw">WITH LOGIN PASSWORD</span> <span class="str">'strong_password'</span>;
+<span class="kw">GRANT CONNECT ON DATABASE</span> mydb <span class="kw">TO</span> app_user;
+<span class="kw">GRANT USAGE ON SCHEMA</span> public <span class="kw">TO</span> app_user;
+<span class="kw">GRANT SELECT, INSERT, UPDATE, DELETE ON ALL TABLES IN SCHEMA</span> public <span class="kw">TO</span> app_user;
+<span class="kw">GRANT USAGE ON ALL SEQUENCES IN SCHEMA</span> public <span class="kw">TO</span> app_user;
+<span class="cmt">-- Cover future tables created by the migration user</span>
+<span class="kw">ALTER DEFAULT PRIVILEGES FOR ROLE</span> migration_user <span class="kw">IN SCHEMA</span> public
+    <span class="kw">GRANT SELECT, INSERT, UPDATE, DELETE ON TABLES TO</span> app_user;
+<span class="kw">ALTER DEFAULT PRIVILEGES FOR ROLE</span> migration_user <span class="kw">IN SCHEMA</span> public
+    <span class="kw">GRANT USAGE ON SEQUENCES TO</span> app_user;</code></pre>
+
+    <h3>✅ Migration / Schema Owner User</h3>
+    <pre><code><span class="kw">CREATE USER</span> migration_user <span class="kw">WITH LOGIN PASSWORD</span> <span class="str">'strong_password'</span>;
+<span class="kw">GRANT CONNECT ON DATABASE</span> mydb <span class="kw">TO</span> migration_user;
+<span class="kw">GRANT CREATE ON DATABASE</span> mydb <span class="kw">TO</span> migration_user;  <span class="cmt">-- create schemas</span>
+<span class="kw">GRANT CREATE ON SCHEMA</span> public <span class="kw">TO</span> migration_user;   <span class="cmt">-- create tables</span></code></pre>
+
+    <h3>✅ Group Role Pattern</h3>
+    <pre><code><span class="cmt">-- Create a group role (no LOGIN)</span>
+<span class="kw">CREATE ROLE</span> readonly_group <span class="kw">NOLOGIN</span>;
+<span class="kw">GRANT USAGE ON SCHEMA</span> public <span class="kw">TO</span> readonly_group;
+<span class="kw">GRANT SELECT ON ALL TABLES IN SCHEMA</span> public <span class="kw">TO</span> readonly_group;
+
+<span class="cmt">-- Add users to the group</span>
+<span class="kw">GRANT</span> readonly_group <span class="kw">TO</span> alice, bob, charlie;
+<span class="cmt">-- All three can now SELECT (assuming default INHERIT)</span>
+
+<span class="cmt">-- Remove a user from the group</span>
+<span class="kw">REVOKE</span> readonly_group <span class="kw">FROM</span> bob;</code></pre>
+
+    <h3>✅ Safely Remove a User</h3>
+    <pre><code><span class="cmt">-- 1. Reassign all objects owned by the user</span>
+<span class="kw">REASSIGN OWNED BY</span> old_user <span class="kw">TO</span> admin_user;
+
+<span class="cmt">-- 2. Drop all remaining privileges (grants, default privileges, etc.)</span>
+<span class="kw">DROP OWNED BY</span> old_user;
+
+<span class="cmt">-- 3. Now it's safe to drop the user</span>
+<span class="kw">DROP USER</span> old_user;</code></pre>
+
+    <!-- ===== 17. BEST PRACTICES ===== -->
+    <span class="section-anchor" id="best-practices"></span>
+    <h2>17. Best Practices</h2>
+
+    <table>
+        <thead><tr><th>#</th><th>Practice</th><th>Why</th></tr></thead>
+        <tbody>
+            <tr><td>1</td><td>Use <strong>group roles</strong> to assign privileges, not individual users</td><td>Easier to manage — add/remove users from a group vs. re-granting everything individually</td></tr>
+            <tr><td>2</td><td><code>REVOKE CREATE ON SCHEMA public FROM PUBLIC</code></td><td>Prevents every user from creating tables in the public schema by default</td></tr>
+            <tr><td>3</td><td><code>REVOKE CONNECT ON DATABASE mydb FROM PUBLIC</code></td><td>Prevents any new user from connecting without an explicit grant</td></tr>
+            <tr><td>4</td><td>Always use <code>ALTER DEFAULT PRIVILEGES</code> for the migration user</td><td>Ensures future tables/sequences are automatically accessible to app users</td></tr>
+            <tr><td>5</td><td>Separate users by role: <code>readonly</code>, <code>app</code>, <code>migration</code></td><td>Principle of least privilege — each user only has what it strictly needs</td></tr>
+            <tr><td>6</td><td>Never use the superuser/admin account in your application</td><td>Limits blast radius if credentials are compromised</td></tr>
+            <tr><td>7</td><td>Prefer <code>pg_read_all_data</code> / <code>pg_write_all_data</code> on PG 14+</td><td>Cleaner than manual grants; automatically covers all schemas including future ones</td></tr>
+            <tr><td>8</td><td>Avoid <code>NOINHERIT</code> for regular app users</td><td>Causes confusing "permission denied" errors even after correctly granting roles</td></tr>
+            <tr><td>9</td><td>Use <code>REASSIGN OWNED</code> + <code>DROP OWNED</code> before <code>DROP USER</code></td><td>Avoids the "role cannot be dropped because some objects depend on it" error</td></tr>
+            <tr><td>10</td><td>Use <code>VALID UNTIL</code> and rotate passwords regularly</td><td>Reduces exposure from leaked credentials over time</td></tr>
+            <tr><td>11</td><td>Lock down <code>SECURITY DEFINER</code> functions by setting <code>search_path</code></td><td>Prevents search path injection attacks against elevated-privilege functions</td></tr>
+            <tr><td>12</td><td>Use RLS for multi-tenant data isolation</td><td>Data isolation at the database layer rather than relying solely on application logic</td></tr>
+        </tbody>
+    </table>
+
+    <div class="callout tip">
+        <div class="callout-title">💡 Quick Sanity Check for any New User</div>
+        Before deploying, verify each of these:
+        <ul>
+            <li>Can the user connect? → <code>has_database_privilege('user', 'db', 'CONNECT')</code></li>
+            <li>Can the user see the schema? → <code>has_schema_privilege('user', 'public', 'USAGE')</code></li>
+            <li>Can the user read tables? → <code>has_table_privilege('user', 'tablename', 'SELECT')</code></li>
+            <li>Can the user create tables? → <code>has_schema_privilege('user', 'public', 'CREATE')</code> (should be <code>false</code> for readonly/app users)</li>
+        </ul>
+    </div>
+
+    <div class="footer">
+        <p>PostgreSQL 14–16 · Based on official PostgreSQL documentation · Covers Flexible Server (Azure), RDS (AWS), and self-hosted deployments</p>
+    </div>
+</main>
+
+</body>
+</html>

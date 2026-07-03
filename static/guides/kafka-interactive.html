@@ -1,0 +1,829 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Kafka System — Interactive Explorer</title>
+<style>
+  :root{
+    --bg:#0b1020;
+    --panel:#121a33;
+    --panel-2:#0f1730;
+    --ink:#e6ecff;
+    --muted:#9aa7d1;
+    --accent:#5eead4;
+    --accent-2:#7c9cff;
+    --warn:#fbbf24;
+    --danger:#f87171;
+    --ok:#34d399;
+    --line:#243057;
+    --chip:#1b2547;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;padding:0;background:linear-gradient(180deg,#070b1a 0%, #0b1020 100%);color:var(--ink);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif}
+  header{padding:20px 28px;border-bottom:1px solid var(--line);display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;background:rgba(10,14,30,.7);position:sticky;top:0;z-index:50;backdrop-filter:blur(8px)}
+  header h1{margin:0;font-size:20px;letter-spacing:.3px}
+  header h1 span{color:var(--accent)}
+  .tabs{display:flex;gap:6px;flex-wrap:wrap}
+  .tab{background:var(--chip);color:var(--ink);border:1px solid var(--line);padding:8px 12px;border-radius:999px;cursor:pointer;font-size:13px}
+  .tab.active{background:linear-gradient(135deg,var(--accent),var(--accent-2));color:#0b1020;border-color:transparent;font-weight:600}
+  main{padding:24px 28px;max-width:1400px;margin:0 auto}
+  .grid{display:grid;grid-template-columns:1.4fr .9fr;gap:20px}
+  @media (max-width:1100px){.grid{grid-template-columns:1fr}}
+  .panel{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:18px;box-shadow:0 6px 24px rgba(0,0,0,.25)}
+  .panel h2{margin:0 0 6px 0;font-size:16px;color:var(--accent)}
+  .panel p.lead{margin:0 0 14px 0;color:var(--muted);font-size:13px}
+  .legend{display:flex;flex-wrap:wrap;gap:10px;margin-bottom:10px}
+  .legend .item{display:flex;align-items:center;gap:6px;font-size:12px;color:var(--muted)}
+  .swatch{width:12px;height:12px;border-radius:3px;display:inline-block}
+  .view{display:none}
+  .view.active{display:block}
+  .controls{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
+  button.act{background:var(--chip);color:var(--ink);border:1px solid var(--line);border-radius:8px;padding:8px 12px;cursor:pointer;font-size:13px}
+  button.act:hover{border-color:var(--accent)}
+  button.primary{background:linear-gradient(135deg,var(--accent),var(--accent-2));color:#0b1020;border-color:transparent;font-weight:600}
+  .info{background:var(--panel-2);border:1px solid var(--line);border-radius:12px;padding:14px;font-size:14px;line-height:1.55}
+  .info h3{margin:0 0 8px 0;font-size:14px;color:var(--accent-2)}
+  .info code{background:#0a0f24;padding:1px 6px;border-radius:4px;color:var(--accent)}
+  .kv{display:grid;grid-template-columns:140px 1fr;gap:6px 12px;font-size:13px}
+  .kv div:nth-child(odd){color:var(--muted)}
+  svg{width:100%;height:auto;display:block}
+  .clickable{cursor:pointer}
+  .clickable:hover{filter:brightness(1.15)}
+  .hl{stroke:var(--accent);stroke-width:2.5}
+  .footer-note{margin-top:14px;color:var(--muted);font-size:12px}
+  ul.tight{margin:6px 0 0 18px;padding:0}
+  ul.tight li{margin:3px 0}
+  .pill{display:inline-block;background:var(--chip);border:1px solid var(--line);border-radius:999px;padding:2px 8px;font-size:11px;color:var(--muted);margin-right:6px}
+  .pill.ok{color:var(--ok);border-color:rgba(52,211,153,.4)}
+  .pill.warn{color:var(--warn);border-color:rgba(251,191,36,.4)}
+  .pill.danger{color:var(--danger);border-color:rgba(248,113,113,.4)}
+  .log-grid{display:grid;grid-template-columns:repeat(12, 1fr);gap:6px;margin-top:8px}
+  .cell{background:var(--panel-2);border:1px solid var(--line);border-radius:6px;padding:6px;text-align:center;font-size:11px;color:var(--muted);position:relative}
+  .cell.has{background:#15224a;border-color:#2c3e7e;color:var(--ink)}
+  .cell.committed{outline:2px solid var(--ok)}
+  .cell.current{outline:2px solid var(--warn)}
+  .cell .off{display:block;font-size:10px;color:var(--muted)}
+  .cell .val{font-weight:600}
+  .rowlabel{font-size:12px;color:var(--muted);margin:10px 0 4px 0}
+  .flex{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+  .stat{background:var(--panel-2);border:1px solid var(--line);border-radius:10px;padding:8px 12px;font-size:12px}
+  .stat b{color:var(--accent)}
+  details{background:var(--panel-2);border:1px solid var(--line);border-radius:10px;padding:10px 12px;margin-top:8px}
+  details summary{cursor:pointer;color:var(--accent-2);font-weight:600}
+</style>
+</head>
+<body>
+
+<header>
+  <h1>⚙️ Kafka System <span>— Interactive Explorer</span></h1>
+  <div class="tabs" id="tabs">
+    <button class="tab active" data-view="arch">Architecture</button>
+    <button class="tab" data-view="produce">Producer → Log</button>
+    <button class="tab" data-view="groups">Consumer Groups</button>
+    <button class="tab" data-view="offsets">Offsets & Commits</button>
+    <button class="tab" data-view="replication">Replication & ISR</button>
+    <button class="tab" data-view="lifecycle">Message Lifecycle</button>
+  </div>
+</header>
+
+<main>
+<div class="grid">
+  <!-- LEFT: VISUAL -->
+  <section class="panel">
+
+    <!-- VIEW: ARCHITECTURE -->
+    <div class="view active" id="view-arch">
+      <h2>Cluster Architecture</h2>
+      <p class="lead">Click any component to inspect it.</p>
+      <div class="legend">
+        <span class="item"><span class="swatch" style="background:#7c9cff"></span>Producers</span>
+        <span class="item"><span class="swatch" style="background:#5eead4"></span>Brokers</span>
+        <span class="item"><span class="swatch" style="background:#fbbf24"></span>Topic / Partitions</span>
+        <span class="item"><span class="swatch" style="background:#f472b6"></span>Consumer Groups</span>
+        <span class="item"><span class="swatch" style="background:#a78bfa"></span>Coordinator / Controller</span>
+      </div>
+
+      <svg viewBox="0 0 900 520">
+        <!-- producers -->
+        <g class="clickable" data-info="producer-app">
+          <rect x="20" y="40" width="140" height="60" rx="10" fill="#1c2a55" stroke="#7c9cff"/>
+          <text x="90" y="68" fill="#e6ecff" font-size="13" text-anchor="middle">Producer: Orders</text>
+          <text x="90" y="86" fill="#9aa7d1" font-size="11" text-anchor="middle">acks=all, idempotent</text>
+        </g>
+        <g class="clickable" data-info="producer-app">
+          <rect x="20" y="120" width="140" height="60" rx="10" fill="#1c2a55" stroke="#7c9cff"/>
+          <text x="90" y="148" fill="#e6ecff" font-size="13" text-anchor="middle">Producer: Payments</text>
+          <text x="90" y="166" fill="#9aa7d1" font-size="11" text-anchor="middle">key=userId</text>
+        </g>
+        <g class="clickable" data-info="producer-app">
+          <rect x="20" y="200" width="140" height="60" rx="10" fill="#1c2a55" stroke="#7c9cff"/>
+          <text x="90" y="228" fill="#e6ecff" font-size="13" text-anchor="middle">Producer: Web</text>
+          <text x="90" y="246" fill="#9aa7d1" font-size="11" text-anchor="middle">linger.ms=20</text>
+        </g>
+
+        <!-- arrows to broker -->
+        <g stroke="#7c9cff" stroke-width="1.5" fill="none" marker-end="url(#arrow)">
+          <path d="M160 70 C 230 70, 240 220, 310 220"/>
+          <path d="M160 150 C 230 150, 240 220, 310 220"/>
+          <path d="M160 230 C 230 230, 240 220, 310 220"/>
+        </g>
+
+        <!-- Cluster box -->
+        <rect x="290" y="20" width="380" height="380" rx="14" fill="#0d1530" stroke="#243057" stroke-dasharray="4 4"/>
+        <text x="480" y="40" fill="#9aa7d1" font-size="12" text-anchor="middle">Kafka Cluster</text>
+
+        <!-- Brokers -->
+        <g class="clickable" data-info="broker">
+          <rect x="310" y="60" width="110" height="100" rx="10" fill="#11304a" stroke="#5eead4"/>
+          <text x="365" y="84" fill="#e6ecff" font-size="13" text-anchor="middle">Broker 1</text>
+          <rect x="320" y="95" width="40" height="22" rx="4" fill="#fbbf24" opacity=".85"/>
+          <text x="340" y="110" fill="#0b1020" font-size="10" text-anchor="middle">P0(L)</text>
+          <rect x="370" y="95" width="40" height="22" rx="4" fill="#fbbf24" opacity=".4"/>
+          <text x="390" y="110" fill="#0b1020" font-size="10" text-anchor="middle">P1(F)</text>
+          <rect x="320" y="125" width="40" height="22" rx="4" fill="#fbbf24" opacity=".4"/>
+          <text x="340" y="140" fill="#0b1020" font-size="10" text-anchor="middle">P2(F)</text>
+        </g>
+        <g class="clickable" data-info="broker">
+          <rect x="430" y="60" width="110" height="100" rx="10" fill="#11304a" stroke="#5eead4"/>
+          <text x="485" y="84" fill="#e6ecff" font-size="13" text-anchor="middle">Broker 2</text>
+          <rect x="440" y="95" width="40" height="22" rx="4" fill="#fbbf24" opacity=".4"/>
+          <text x="460" y="110" fill="#0b1020" font-size="10" text-anchor="middle">P0(F)</text>
+          <rect x="490" y="95" width="40" height="22" rx="4" fill="#fbbf24" opacity=".85"/>
+          <text x="510" y="110" fill="#0b1020" font-size="10" text-anchor="middle">P1(L)</text>
+          <rect x="440" y="125" width="40" height="22" rx="4" fill="#fbbf24" opacity=".4"/>
+          <text x="460" y="140" fill="#0b1020" font-size="10" text-anchor="middle">P2(F)</text>
+        </g>
+        <g class="clickable" data-info="broker">
+          <rect x="550" y="60" width="110" height="100" rx="10" fill="#11304a" stroke="#5eead4"/>
+          <text x="605" y="84" fill="#e6ecff" font-size="13" text-anchor="middle">Broker 3</text>
+          <rect x="560" y="95" width="40" height="22" rx="4" fill="#fbbf24" opacity=".4"/>
+          <text x="580" y="110" fill="#0b1020" font-size="10" text-anchor="middle">P0(F)</text>
+          <rect x="610" y="95" width="40" height="22" rx="4" fill="#fbbf24" opacity=".4"/>
+          <text x="630" y="110" fill="#0b1020" font-size="10" text-anchor="middle">P1(F)</text>
+          <rect x="560" y="125" width="40" height="22" rx="4" fill="#fbbf24" opacity=".85"/>
+          <text x="580" y="140" fill="#0b1020" font-size="10" text-anchor="middle">P2(L)</text>
+        </g>
+
+        <!-- Controller / Coordinator -->
+        <g class="clickable" data-info="controller">
+          <rect x="310" y="200" width="160" height="60" rx="10" fill="#241a4a" stroke="#a78bfa"/>
+          <text x="390" y="225" fill="#e6ecff" font-size="13" text-anchor="middle">Controller (KRaft)</text>
+          <text x="390" y="244" fill="#9aa7d1" font-size="11" text-anchor="middle">Metadata, leaders, ISR</text>
+        </g>
+        <g class="clickable" data-info="coordinator">
+          <rect x="490" y="200" width="170" height="60" rx="10" fill="#241a4a" stroke="#a78bfa"/>
+          <text x="575" y="225" fill="#e6ecff" font-size="13" text-anchor="middle">Group Coordinator</text>
+          <text x="575" y="244" fill="#9aa7d1" font-size="11" text-anchor="middle">Owns __consumer_offsets</text>
+        </g>
+
+        <!-- Topic -->
+        <g class="clickable" data-info="topic">
+          <rect x="310" y="290" width="350" height="90" rx="10" fill="#3a2c0d" stroke="#fbbf24"/>
+          <text x="485" y="312" fill="#e6ecff" font-size="13" text-anchor="middle">Topic: "orders" — 3 partitions, RF=3</text>
+          <rect x="325" y="325" width="100" height="40" rx="6" fill="#5b4416"/>
+          <text x="375" y="350" fill="#fde68a" font-size="11" text-anchor="middle">P0 log</text>
+          <rect x="435" y="325" width="100" height="40" rx="6" fill="#5b4416"/>
+          <text x="485" y="350" fill="#fde68a" font-size="11" text-anchor="middle">P1 log</text>
+          <rect x="545" y="325" width="100" height="40" rx="6" fill="#5b4416"/>
+          <text x="595" y="350" fill="#fde68a" font-size="11" text-anchor="middle">P2 log</text>
+        </g>
+
+        <!-- Consumer Groups -->
+        <g class="clickable" data-info="group">
+          <rect x="720" y="60" width="160" height="120" rx="10" fill="#3a1a2e" stroke="#f472b6"/>
+          <text x="800" y="82" fill="#e6ecff" font-size="13" text-anchor="middle">Group: billing</text>
+          <rect x="735" y="95" width="60" height="30" rx="6" fill="#5a2540"/>
+          <text x="765" y="114" fill="#fbcfe8" font-size="11" text-anchor="middle">C1 ⇢ P0</text>
+          <rect x="805" y="95" width="60" height="30" rx="6" fill="#5a2540"/>
+          <text x="835" y="114" fill="#fbcfe8" font-size="11" text-anchor="middle">C2 ⇢ P1</text>
+          <rect x="735" y="135" width="130" height="30" rx="6" fill="#5a2540"/>
+          <text x="800" y="154" fill="#fbcfe8" font-size="11" text-anchor="middle">C3 ⇢ P2</text>
+        </g>
+        <g class="clickable" data-info="group">
+          <rect x="720" y="200" width="160" height="120" rx="10" fill="#3a1a2e" stroke="#f472b6"/>
+          <text x="800" y="222" fill="#e6ecff" font-size="13" text-anchor="middle">Group: analytics</text>
+          <rect x="735" y="235" width="130" height="30" rx="6" fill="#5a2540"/>
+          <text x="800" y="254" fill="#fbcfe8" font-size="11" text-anchor="middle">C1 ⇢ P0,P1</text>
+          <rect x="735" y="275" width="130" height="30" rx="6" fill="#5a2540"/>
+          <text x="800" y="294" fill="#fbcfe8" font-size="11" text-anchor="middle">C2 ⇢ P2</text>
+        </g>
+
+        <!-- Stream Processor -->
+        <g class="clickable" data-info="stream">
+          <rect x="720" y="340" width="160" height="60" rx="10" fill="#0f2e2a" stroke="#5eead4"/>
+          <text x="800" y="365" fill="#e6ecff" font-size="13" text-anchor="middle">Stream Processor</text>
+          <text x="800" y="384" fill="#9aa7d1" font-size="11" text-anchor="middle">Kafka Streams / Flink</text>
+        </g>
+
+        <!-- arrows topic → groups -->
+        <g stroke="#f472b6" stroke-width="1.5" fill="none" marker-end="url(#arrow2)">
+          <path d="M660 330 C 690 200, 700 130, 720 120"/>
+          <path d="M660 350 C 690 280, 700 270, 720 260"/>
+          <path d="M660 365 C 690 380, 700 380, 720 370"/>
+        </g>
+
+        <!-- Schema Registry & Connect -->
+        <g class="clickable" data-info="schema">
+          <rect x="20" y="320" width="140" height="50" rx="10" fill="#1c2a55" stroke="#7c9cff"/>
+          <text x="90" y="342" fill="#e6ecff" font-size="13" text-anchor="middle">Schema Registry</text>
+          <text x="90" y="358" fill="#9aa7d1" font-size="11" text-anchor="middle">Avro/Protobuf/JSON</text>
+        </g>
+        <g class="clickable" data-info="connect">
+          <rect x="20" y="390" width="140" height="50" rx="10" fill="#1c2a55" stroke="#7c9cff"/>
+          <text x="90" y="412" fill="#e6ecff" font-size="13" text-anchor="middle">Kafka Connect</text>
+          <text x="90" y="428" fill="#9aa7d1" font-size="11" text-anchor="middle">Source / Sink</text>
+        </g>
+
+        <defs>
+          <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+            <path d="M0,0 L10,5 L0,10 z" fill="#7c9cff"/>
+          </marker>
+          <marker id="arrow2" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+            <path d="M0,0 L10,5 L0,10 z" fill="#f472b6"/>
+          </marker>
+        </defs>
+      </svg>
+      <p class="footer-note">L = Leader replica, F = Follower replica. The leader handles all reads/writes for that partition.</p>
+    </div>
+
+    <!-- VIEW: PRODUCE -->
+    <div class="view" id="view-produce">
+      <h2>Producer → Partition Log</h2>
+      <p class="lead">Send messages and watch them get partitioned, appended to the log, and replicated.</p>
+
+      <div class="controls">
+        <label class="stat">Key: <input id="prodKey" type="text" value="user-42" style="width:90px;background:#0a0f24;color:#e6ecff;border:1px solid #243057;border-radius:6px;padding:4px 6px"/></label>
+        <label class="stat">Value: <input id="prodVal" type="text" value="order_created" style="width:140px;background:#0a0f24;color:#e6ecff;border:1px solid #243057;border-radius:6px;padding:4px 6px"/></label>
+        <button class="act primary" id="sendBtn">▶ Produce</button>
+        <button class="act" id="sendRandom">🎲 Random key</button>
+        <button class="act" id="resetLog">↺ Reset log</button>
+      </div>
+
+      <div class="rowlabel">Topic: <b>orders</b> — partitioning rule: <code>hash(key) % numPartitions</code></div>
+      <div id="logsContainer"></div>
+
+      <details>
+        <summary>How the message reaches the log</summary>
+        <ol>
+          <li><b>Serializer</b> turns key/value to bytes (optionally validated against Schema Registry).</li>
+          <li><b>Partitioner</b> picks a partition: <code>murmur2(key) % N</code> if key present; sticky/round-robin if not.</li>
+          <li><b>Accumulator</b> batches records per partition (controlled by <code>linger.ms</code> and <code>batch.size</code>).</li>
+          <li><b>Sender</b> ships batch to the partition <b>leader broker</b>.</li>
+          <li>Leader <b>appends</b> to its on-disk segment, assigning the next <b>offset</b>.</li>
+          <li>Followers <b>fetch</b> and replicate; once in-sync replicas (ISR) ack, the leader acks the producer (<code>acks=all</code>).</li>
+        </ol>
+      </details>
+    </div>
+
+    <!-- VIEW: GROUPS -->
+    <div class="view" id="view-groups">
+      <h2>Consumer Groups & Partition Assignment</h2>
+      <p class="lead">Add/remove consumers to see Kafka rebalance partitions across the group.</p>
+
+      <div class="controls">
+        <button class="act primary" id="addConsumer">＋ Add consumer to group "billing"</button>
+        <button class="act" id="removeConsumer">－ Remove last consumer</button>
+        <button class="act" id="addGroup">＋ Add another group ("analytics")</button>
+        <button class="act" id="resetGroups">↺ Reset</button>
+      </div>
+
+      <svg id="groupsSvg" viewBox="0 0 800 420"></svg>
+
+      <details>
+        <summary>The rules of consumer groups</summary>
+        <ul class="tight">
+          <li>A <b>consumer group</b> is identified by <code>group.id</code>. Each partition is consumed by <b>exactly one consumer</b> inside the group.</li>
+          <li>If <b>consumers &gt; partitions</b>, the extra consumers sit idle.</li>
+          <li>If <b>consumers &lt; partitions</b>, some consumers handle multiple partitions.</li>
+          <li><b>Different groups</b> read the same topic independently — each maintains its own offsets.</li>
+          <li>Joining/leaving triggers a <b>rebalance</b> coordinated by the <b>Group Coordinator</b>.</li>
+        </ul>
+      </details>
+    </div>
+
+    <!-- VIEW: OFFSETS -->
+    <div class="view" id="view-offsets">
+      <h2>Offsets, Commits & Lag</h2>
+      <p class="lead">Step the consumer forward through the log. Commit offsets to mark "processed".</p>
+
+      <div class="controls">
+        <button class="act" id="appendOff">＋ Append message (producer)</button>
+        <button class="act primary" id="consumeOff">▶ Consume next</button>
+        <button class="act" id="commitOff">✓ Commit current offset</button>
+        <button class="act" id="seekStart">⏮ Seek to earliest</button>
+        <button class="act" id="seekEnd">⏭ Seek to latest</button>
+        <button class="act" id="resetOff">↺ Reset</button>
+      </div>
+
+      <div class="flex" style="margin-top:10px">
+        <div class="stat">Log End Offset (LEO): <b id="leoStat">0</b></div>
+        <div class="stat">Current Position: <b id="posStat">0</b></div>
+        <div class="stat">Committed Offset: <b id="comStat">—</b></div>
+        <div class="stat">Consumer Lag: <b id="lagStat">0</b></div>
+      </div>
+
+      <div class="rowlabel">Partition log (offsets are 0-indexed and append-only):</div>
+      <div class="log-grid" id="offLog"></div>
+      <div class="legend" style="margin-top:10px">
+        <span class="item"><span class="swatch" style="background:#15224a;border:1px solid #2c3e7e"></span>Stored message</span>
+        <span class="item"><span class="swatch" style="background:#0f1730;border:2px solid var(--ok)"></span>Last committed</span>
+        <span class="item"><span class="swatch" style="background:#0f1730;border:2px solid var(--warn)"></span>Current position</span>
+      </div>
+
+      <details>
+        <summary>What "committing" actually does</summary>
+        <p>The consumer sends a tiny record like
+          <code>{group: "billing", topic: "orders", partition: 0, offset: 17}</code>
+          to the internal compacted topic <code>__consumer_offsets</code>.
+          On restart or rebalance, the new consumer for that partition resumes from the <b>last committed offset + 1</b>.</p>
+        <ul class="tight">
+          <li><b>Auto-commit</b> (<code>enable.auto.commit=true</code>): periodic, easy but can lose or duplicate messages.</li>
+          <li><b>Manual sync commit</b>: <code>consumer.commitSync()</code> after successful processing → at-least-once.</li>
+          <li><b>Transactional</b>: produce + commit-offset atomically → exactly-once within Kafka.</li>
+        </ul>
+      </details>
+    </div>
+
+    <!-- VIEW: REPLICATION -->
+    <div class="view" id="view-replication">
+      <h2>Replication & ISR</h2>
+      <p class="lead">Toggle followers to see how the In-Sync Replica set protects your data.</p>
+
+      <svg id="replSvg" viewBox="0 0 800 360"></svg>
+
+      <div class="controls">
+        <button class="act" id="killF1">💥 Kill Follower 1</button>
+        <button class="act" id="killF2">💥 Kill Follower 2</button>
+        <button class="act" id="killLeader">💥 Kill Leader</button>
+        <button class="act" id="reviveAll">❤ Revive all</button>
+      </div>
+
+      <details open>
+        <summary>How <code>acks</code> and ISR interact</summary>
+        <ul class="tight">
+          <li><b>acks=0</b>: fire-and-forget. Fastest, can lose data.</li>
+          <li><b>acks=1</b>: leader writes locally and acks. Loss possible if leader crashes before replication.</li>
+          <li><b>acks=all</b> + <b>min.insync.replicas=2</b>: leader waits for all ISR followers to replicate. Strongest durability.</li>
+          <li>If a follower lags beyond <code>replica.lag.time.max.ms</code>, it's <b>kicked out of ISR</b>.</li>
+          <li>If leader dies, the controller <b>elects a new leader from ISR</b>.</li>
+        </ul>
+      </details>
+    </div>
+
+    <!-- VIEW: LIFECYCLE -->
+    <div class="view" id="view-lifecycle">
+      <h2>End-to-End Message Lifecycle</h2>
+      <p class="lead">Step through what happens to a single message, from <code>producer.send()</code> to <code>commitSync()</code>.</p>
+
+      <div class="controls">
+        <button class="act" id="lifePrev">◀ Prev</button>
+        <button class="act primary" id="lifeNext">Next ▶</button>
+        <button class="act" id="lifeReset">↺ Reset</button>
+        <span class="stat">Step <b id="lifeStep">1</b> / 9</span>
+      </div>
+
+      <svg id="lifeSvg" viewBox="0 0 900 360"></svg>
+
+      <div class="info" id="lifeText" style="margin-top:10px"></div>
+    </div>
+  </section>
+
+  <!-- RIGHT: INFO PANEL -->
+  <aside class="panel">
+    <h2 id="sideTitle">Component Inspector</h2>
+    <p class="lead" id="sideLead">Click any element on the left to inspect it.</p>
+    <div class="info" id="sideBody">
+      <h3>Welcome 👋</h3>
+      <p>This page is an interactive cheat sheet for an event-driven system built on <b>Apache Kafka</b>.</p>
+      <p>Use the tabs above to switch views. Most diagrams are clickable.</p>
+      <ul class="tight">
+        <li><b>Architecture</b> – every moving part</li>
+        <li><b>Producer → Log</b> – how a message lands on disk</li>
+        <li><b>Consumer Groups</b> – assignment & rebalancing</li>
+        <li><b>Offsets & Commits</b> – position tracking and lag</li>
+        <li><b>Replication & ISR</b> – durability and failover</li>
+        <li><b>Lifecycle</b> – step-by-step animation</li>
+      </ul>
+    </div>
+  </aside>
+</div>
+</main>
+
+<script>
+/* ---------- Tabs ---------- */
+const tabs = document.querySelectorAll('.tab');
+tabs.forEach(t => t.addEventListener('click', () => {
+  tabs.forEach(x => x.classList.remove('active'));
+  t.classList.add('active');
+  document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+  document.getElementById('view-' + t.dataset.view).classList.add('active');
+}));
+
+/* ---------- Side panel info dictionary ---------- */
+const INFO = {
+  'producer-app': {
+    title: 'Producer',
+    body: `<h3>Producer Application</h3>
+      <p>A client library that publishes records to a topic. It serializes the key/value, picks a partition, batches, and sends to the partition leader.</p>
+      <div class="kv">
+        <div>Key config</div><div><code>bootstrap.servers</code>, <code>acks</code>, <code>linger.ms</code>, <code>batch.size</code>, <code>enable.idempotence</code></div>
+        <div>Partitioner</div><div><code>hash(key) % N</code>, or sticky if no key</div>
+        <div>Guarantees</div><div>at-least-once by default; exactly-once with <code>transactional.id</code></div>
+      </div>`
+  },
+  'broker': {
+    title: 'Broker',
+    body: `<h3>Broker</h3>
+      <p>A Kafka server process. Stores partition logs on disk, serves produce/fetch requests, and replicates partitions.</p>
+      <ul class="tight">
+        <li>Each partition has one <b>leader broker</b> and zero or more <b>followers</b>.</li>
+        <li>Brokers form a <b>cluster</b>; one acts as the <b>controller</b>.</li>
+        <li>Scales horizontally — add brokers to add throughput/storage.</li>
+      </ul>`
+  },
+  'controller': {
+    title: 'Controller',
+    body: `<h3>Cluster Controller (KRaft)</h3>
+      <p>The "brain" of the cluster. Manages broker membership, partition leaders, ISR changes, and topic metadata.</p>
+      <p>In modern Kafka (KRaft mode), the controller quorum replaces ZooKeeper using Raft consensus.</p>`
+  },
+  'coordinator': {
+    title: 'Group Coordinator',
+    body: `<h3>Group Coordinator</h3>
+      <p>A broker assigned to manage one or more consumer groups. It:</p>
+      <ul class="tight">
+        <li>Tracks consumer membership and heartbeats.</li>
+        <li>Drives <b>rebalances</b> when consumers join/leave.</li>
+        <li>Stores committed offsets in the internal compacted topic <code>__consumer_offsets</code>.</li>
+      </ul>`
+  },
+  'topic': {
+    title: 'Topic & Partitions',
+    body: `<h3>Topic</h3>
+      <p>A logical, named stream of events (e.g., <code>orders</code>). Split into <b>partitions</b> for parallelism.</p>
+      <ul class="tight">
+        <li>Each partition is an <b>append-only log</b> of records.</li>
+        <li>Records are addressed by an integer <b>offset</b>.</li>
+        <li>Order is guaranteed <i>within</i> a partition, not across.</li>
+        <li>Retention is by <b>time</b> or <b>size</b>, or by <b>log compaction</b> (key-based).</li>
+      </ul>`
+  },
+  'group': {
+    title: 'Consumer Group',
+    body: `<h3>Consumer Group</h3>
+      <p>A set of consumers sharing the same <code>group.id</code> that cooperatively consume a topic.</p>
+      <ul class="tight">
+        <li>Each partition → consumed by <b>one</b> member of the group.</li>
+        <li>Different groups read independently with their own offsets.</li>
+        <li>Adding consumers (up to # partitions) increases throughput.</li>
+      </ul>`
+  },
+  'stream': {
+    title: 'Stream Processor',
+    body: `<h3>Stream Processor</h3>
+      <p>Apps that consume topics, transform/aggregate, and produce results back to Kafka. Examples: <b>Kafka Streams</b>, <b>ksqlDB</b>, <b>Apache Flink</b>.</p>
+      <p>State stores are often backed by <b>changelog topics</b> for fault tolerance.</p>`
+  },
+  'schema': {
+    title: 'Schema Registry',
+    body: `<h3>Schema Registry</h3>
+      <p>Out-of-band service that stores Avro/Protobuf/JSON schemas. Producers register schemas; consumers fetch them by ID to decode payloads.</p>
+      <p>Enables <b>schema evolution</b> with compatibility rules (backward/forward/full).</p>`
+  },
+  'connect': {
+    title: 'Kafka Connect',
+    body: `<h3>Kafka Connect</h3>
+      <p>A framework for streaming data <b>in</b> (Source connectors, e.g., Debezium CDC) and <b>out</b> (Sink connectors, e.g., to S3/Elastic/Postgres) without writing code.</p>`
+  }
+};
+function showInfo(key){
+  const i = INFO[key];
+  if(!i) return;
+  document.getElementById('sideTitle').textContent = i.title;
+  document.getElementById('sideLead').textContent = 'Component details';
+  document.getElementById('sideBody').innerHTML = i.body;
+}
+document.querySelectorAll('.clickable').forEach(el => {
+  el.addEventListener('click', () => showInfo(el.dataset.info));
+});
+
+/* ============================================================
+   VIEW: PRODUCER → LOG
+============================================================ */
+const NUM_PARTITIONS = 3;
+let logs = [[],[],[]];
+function hashKey(k){
+  let h = 0;
+  for(let i=0;i<k.length;i++){ h = (h*31 + k.charCodeAt(i)) | 0; }
+  return Math.abs(h);
+}
+function renderLogs(){
+  const container = document.getElementById('logsContainer');
+  container.innerHTML = '';
+  for(let p=0;p<NUM_PARTITIONS;p++){
+    const wrap = document.createElement('div');
+    wrap.innerHTML = `<div class="rowlabel">Partition ${p} &nbsp; <span class="pill">leader: Broker ${p+1}</span> <span class="pill ok">ISR: [${p+1},${(p+1)%3+1},${(p+2)%3+1}]</span></div>`;
+    const grid = document.createElement('div');
+    grid.className = 'log-grid';
+    for(let i=0;i<12;i++){
+      const cell = document.createElement('div');
+      const rec = logs[p][i];
+      cell.className = 'cell' + (rec ? ' has':'');
+      cell.innerHTML = `<span class="off">off ${i}</span><span class="val">${rec ? rec.k+'→'+rec.v : '∅'}</span>`;
+      grid.appendChild(cell);
+    }
+    wrap.appendChild(grid);
+    container.appendChild(wrap);
+  }
+}
+function produce(k,v){
+  const p = hashKey(k) % NUM_PARTITIONS;
+  if(logs[p].length >= 12){
+    alert('Partition ' + p + ' is full in this demo (12 slots). Reset to continue.');
+    return;
+  }
+  logs[p].push({k,v});
+  renderLogs();
+  showInfo('topic');
+  document.getElementById('sideBody').innerHTML += `<div class="info" style="margin-top:8px"><h3>Just produced</h3>
+    <div class="kv">
+      <div>Key</div><div><code>${k}</code></div>
+      <div>Value</div><div><code>${v}</code></div>
+      <div>Hash</div><div><code>${hashKey(k)}</code></div>
+      <div>Partition</div><div><b>${p}</b> &nbsp; <span class="pill">hash % ${NUM_PARTITIONS}</span></div>
+      <div>Offset</div><div><b>${logs[p].length-1}</b></div>
+    </div></div>`;
+}
+document.getElementById('sendBtn').onclick = () => produce(
+  document.getElementById('prodKey').value || 'null',
+  document.getElementById('prodVal').value || 'event'
+);
+document.getElementById('sendRandom').onclick = () => {
+  const keys = ['user-1','user-7','user-42','user-99','order-A','order-B','order-C'];
+  document.getElementById('prodKey').value = keys[Math.floor(Math.random()*keys.length)];
+  document.getElementById('sendBtn').click();
+};
+document.getElementById('resetLog').onclick = () => { logs=[[],[],[]]; renderLogs(); };
+renderLogs();
+
+/* ============================================================
+   VIEW: CONSUMER GROUPS
+============================================================ */
+let groups = [
+  { name:'billing',   color:'#f472b6', consumers:['C1','C2','C3'] }
+];
+const TOPIC_PARTITIONS = 6;
+function assignPartitions(consumers){
+  // Range-style round robin
+  const a = {};
+  consumers.forEach(c => a[c] = []);
+  if(consumers.length===0) return a;
+  for(let p=0;p<TOPIC_PARTITIONS;p++){
+    const c = consumers[p % consumers.length];
+    a[c].push(p);
+  }
+  return a;
+}
+function renderGroups(){
+  const svg = document.getElementById('groupsSvg');
+  svg.innerHTML = '';
+  // Topic at top
+  const topic = `
+    <rect x="20" y="20" width="760" height="70" rx="10" fill="#3a2c0d" stroke="#fbbf24"/>
+    <text x="400" y="42" fill="#e6ecff" font-size="13" text-anchor="middle">Topic "orders" — ${TOPIC_PARTITIONS} partitions</text>
+    ${Array.from({length:TOPIC_PARTITIONS}).map((_,i)=>{
+      const w = 700/TOPIC_PARTITIONS;
+      return `<rect x="${40+i*w}" y="55" width="${w-8}" height="28" rx="6" fill="#5b4416"/>
+              <text x="${40+i*w+(w-8)/2}" y="73" fill="#fde68a" font-size="11" text-anchor="middle">P${i}</text>`;
+    }).join('')}
+  `;
+  svg.insertAdjacentHTML('beforeend', topic);
+
+  let y = 120;
+  groups.forEach((g,gi) => {
+    const a = assignPartitions(g.consumers);
+    const h = 40 + g.consumers.length*36;
+    svg.insertAdjacentHTML('beforeend', `
+      <rect x="20" y="${y}" width="760" height="${h}" rx="10" fill="#1c1a3a" stroke="${g.color}" stroke-opacity=".7"/>
+      <text x="35" y="${y+22}" fill="${g.color}" font-size="13" font-weight="600">Group: ${g.name}</text>
+    `);
+    g.consumers.forEach((c,ci) => {
+      const cy = y + 36 + ci*34;
+      const parts = a[c];
+      const label = parts.length ? parts.map(p=>'P'+p).join(', ') : '(idle — no partitions)';
+      const color = parts.length ? '#5a2540' : '#3a1a2e';
+      svg.insertAdjacentHTML('beforeend', `
+        <rect x="40" y="${cy}" width="120" height="26" rx="6" fill="${color}" stroke="${g.color}" stroke-opacity=".5"/>
+        <text x="100" y="${cy+17}" fill="#fbcfe8" font-size="12" text-anchor="middle">${c}</text>
+        <text x="180" y="${cy+17}" fill="#e6ecff" font-size="12">${label}</text>
+      `);
+      // draw lines from partitions to consumer
+      parts.forEach(p => {
+        const w = 700/TOPIC_PARTITIONS;
+        const px = 40 + p*w + (w-8)/2;
+        svg.insertAdjacentHTML('beforeend', `
+          <path d="M${px} 83 C ${px} ${cy-10}, 100 ${cy-10}, 100 ${cy}" stroke="${g.color}" stroke-opacity=".5" fill="none" stroke-width="1.2"/>
+        `);
+      });
+    });
+    y += h + 14;
+  });
+  svg.setAttribute('viewBox', `0 0 800 ${Math.max(420,y)}`);
+}
+document.getElementById('addConsumer').onclick = () => {
+  const g = groups.find(x=>x.name==='billing') || groups[0];
+  g.consumers.push('C'+(g.consumers.length+1));
+  renderGroups();
+  showInfo('group');
+};
+document.getElementById('removeConsumer').onclick = () => {
+  const g = groups.find(x=>x.name==='billing') || groups[0];
+  if(g.consumers.length>0){ g.consumers.pop(); renderGroups(); showInfo('group'); }
+};
+document.getElementById('addGroup').onclick = () => {
+  if(!groups.find(g=>g.name==='analytics')){
+    groups.push({name:'analytics', color:'#5eead4', consumers:['C1','C2']});
+    renderGroups(); showInfo('group');
+  }
+};
+document.getElementById('resetGroups').onclick = () => {
+  groups = [{ name:'billing', color:'#f472b6', consumers:['C1','C2','C3']}];
+  renderGroups();
+};
+renderGroups();
+
+/* ============================================================
+   VIEW: OFFSETS
+============================================================ */
+const SLOTS = 12;
+let off = { log: [], position: 0, committed: null };
+function seedOffLog(){
+  off.log = ['order_created','order_paid','order_shipped','order_returned','order_created','order_paid'];
+  off.position = 0;
+  off.committed = null;
+}
+seedOffLog();
+function renderOff(){
+  const grid = document.getElementById('offLog');
+  grid.innerHTML = '';
+  for(let i=0;i<SLOTS;i++){
+    const has = i < off.log.length;
+    const cell = document.createElement('div');
+    cell.className = 'cell' + (has?' has':'') +
+      (off.committed===i ? ' committed':'') +
+      (off.position===i && has ? ' current':'');
+    cell.innerHTML = `<span class="off">off ${i}</span><span class="val">${has?off.log[i]:'∅'}</span>`;
+    grid.appendChild(cell);
+  }
+  document.getElementById('leoStat').textContent = off.log.length;
+  document.getElementById('posStat').textContent = off.position;
+  document.getElementById('comStat').textContent = off.committed === null ? '—' : off.committed;
+  const lag = Math.max(0, off.log.length - off.position);
+  document.getElementById('lagStat').textContent = lag;
+}
+document.getElementById('appendOff').onclick = () => {
+  if(off.log.length>=SLOTS) return;
+  off.log.push('event_'+off.log.length);
+  renderOff();
+};
+document.getElementById('consumeOff').onclick = () => {
+  if(off.position < off.log.length){
+    showInfo('coordinator');
+    document.getElementById('sideBody').innerHTML += `<div class="info" style="margin-top:8px"><h3>Consumed offset ${off.position}</h3>
+      <p>Value: <code>${off.log[off.position]}</code></p>
+      <p>Position advances to <b>${off.position+1}</b>. This is in-memory only — until you <b>commit</b>, a restart would re-read from the last committed offset.</p></div>`;
+    off.position++;
+    renderOff();
+  }
+};
+document.getElementById('commitOff').onclick = () => {
+  if(off.position===0){ alert('Nothing consumed yet'); return; }
+  off.committed = off.position - 1;
+  renderOff();
+  showInfo('coordinator');
+};
+document.getElementById('seekStart').onclick = () => { off.position=0; renderOff(); };
+document.getElementById('seekEnd').onclick = () => { off.position=off.log.length; renderOff(); };
+document.getElementById('resetOff').onclick = () => { seedOffLog(); renderOff(); };
+renderOff();
+
+/* ============================================================
+   VIEW: REPLICATION
+============================================================ */
+let repl = { leader:true, f1:true, f2:true };
+function renderRepl(){
+  const svg = document.getElementById('replSvg');
+  const inSync = (repl.leader?1:0) + (repl.f1?1:0) + (repl.f2?1:0);
+  const isr = [
+    repl.leader?'L':null, repl.f1?'F1':null, repl.f2?'F2':null
+  ].filter(Boolean);
+  let warn = '';
+  if(!repl.leader) warn = `<text x="400" y="335" fill="#f87171" font-size="12" text-anchor="middle">⚠ Leader down — controller elects new leader from ISR: [${isr.join(', ')||'none!'}]</text>`;
+  else if(inSync<2) warn = `<text x="400" y="335" fill="#fbbf24" font-size="12" text-anchor="middle">⚠ ISR size = ${inSync}. With min.insync.replicas=2 and acks=all, producer would get NotEnoughReplicas.</text>`;
+  else warn = `<text x="400" y="335" fill="#34d399" font-size="12" text-anchor="middle">✓ Healthy. ISR = [${isr.join(', ')}]. acks=all writes succeed.</text>`;
+
+  svg.innerHTML = `
+    <rect x="40" y="40" width="180" height="200" rx="12" fill="${repl.leader?'#11304a':'#3a1414'}" stroke="${repl.leader?'#5eead4':'#f87171'}"/>
+    <text x="130" y="68" fill="#e6ecff" font-size="14" text-anchor="middle">${repl.leader?'Leader':'Leader (DOWN)'}</text>
+    <text x="130" y="88" fill="#9aa7d1" font-size="11" text-anchor="middle">Broker 1 · Partition 0</text>
+    ${[0,1,2,3,4].map(i => `<rect x="${55+i*28}" y="110" width="22" height="22" rx="4" fill="#5b4416"/><text x="${66+i*28}" y="125" fill="#fde68a" font-size="10" text-anchor="middle">${i}</text>`).join('')}
+    <text x="130" y="165" fill="#9aa7d1" font-size="11" text-anchor="middle">LEO: 5  HW: ${Math.min(5, repl.f1&&repl.f2?5:(repl.f1||repl.f2?5:0))}</text>
+
+    <rect x="290" y="40" width="180" height="90" rx="12" fill="${repl.f1?'#10243a':'#3a1414'}" stroke="${repl.f1?'#7c9cff':'#f87171'}"/>
+    <text x="380" y="68" fill="#e6ecff" font-size="13" text-anchor="middle">${repl.f1?'Follower 1':'Follower 1 (DOWN)'}</text>
+    <text x="380" y="86" fill="#9aa7d1" font-size="11" text-anchor="middle">Broker 2 · replica of P0</text>
+    <text x="380" y="110" fill="#9aa7d1" font-size="11" text-anchor="middle">${repl.f1?'In ISR ✓':'Removed from ISR'}</text>
+
+    <rect x="290" y="150" width="180" height="90" rx="12" fill="${repl.f2?'#10243a':'#3a1414'}" stroke="${repl.f2?'#7c9cff':'#f87171'}"/>
+    <text x="380" y="178" fill="#e6ecff" font-size="13" text-anchor="middle">${repl.f2?'Follower 2':'Follower 2 (DOWN)'}</text>
+    <text x="380" y="196" fill="#9aa7d1" font-size="11" text-anchor="middle">Broker 3 · replica of P0</text>
+    <text x="380" y="220" fill="#9aa7d1" font-size="11" text-anchor="middle">${repl.f2?'In ISR ✓':'Removed from ISR'}</text>
+
+    <rect x="540" y="40" width="220" height="200" rx="12" fill="#241a4a" stroke="#a78bfa"/>
+    <text x="650" y="68" fill="#e6ecff" font-size="13" text-anchor="middle">Controller</text>
+    <text x="650" y="92" fill="#9aa7d1" font-size="11" text-anchor="middle">Monitors heartbeats</text>
+    <text x="650" y="114" fill="#9aa7d1" font-size="11" text-anchor="middle">Updates ISR</text>
+    <text x="650" y="136" fill="#9aa7d1" font-size="11" text-anchor="middle">Elects leaders on failure</text>
+    <text x="650" y="170" fill="#5eead4" font-size="12" text-anchor="middle">Current ISR:</text>
+    <text x="650" y="190" fill="#e6ecff" font-size="14" text-anchor="middle">[${isr.join(', ')||'∅'}]</text>
+
+    ${repl.leader&&repl.f1?'<path d="M220 100 L290 80" stroke="#7c9cff" stroke-width="1.5" fill="none"/>':''}
+    ${repl.leader&&repl.f2?'<path d="M220 150 L290 190" stroke="#7c9cff" stroke-width="1.5" fill="none"/>':''}
+    ${warn}
+  `;
+}
+document.getElementById('killF1').onclick = () => { repl.f1=!repl.f1; renderRepl(); };
+document.getElementById('killF2').onclick = () => { repl.f2=!repl.f2; renderRepl(); };
+document.getElementById('killLeader').onclick = () => { repl.leader=!repl.leader; renderRepl(); };
+document.getElementById('reviveAll').onclick = () => { repl={leader:true,f1:true,f2:true}; renderRepl(); };
+renderRepl();
+
+/* ============================================================
+   VIEW: LIFECYCLE
+============================================================ */
+const lifeSteps = [
+  { title:'1. Producer.send()', text:'Application calls <code>producer.send(record)</code>. The record has key, value, optional headers and a target topic.' },
+  { title:'2. Serialize & Partition', text:'Key/value are serialized to bytes. The partitioner computes <code>hash(key) % N</code> → partition <b>P1</b>.' },
+  { title:'3. Accumulator batching', text:'Record is queued in a per-partition buffer until <code>linger.ms</code> elapses or <code>batch.size</code> is reached.' },
+  { title:'4. Sent to leader broker', text:'The batch is dispatched over TCP to <b>Broker 2</b>, the current leader of partition P1.' },
+  { title:'5. Append to log segment', text:'Leader appends records to the active <b>segment file</b>, assigning offsets 17, 18, 19…' },
+  { title:'6. Followers replicate', text:'Followers on Broker 1 & 3 issue <b>fetch</b> requests and replicate the new records into their own logs.' },
+  { title:'7. ISR acknowledges', text:'Once all in-sync replicas have the records, the leader bumps the <b>High Watermark (HW)</b> and acks the producer (with <code>acks=all</code>).' },
+  { title:'8. Consumer fetches', text:'A consumer in group "billing" assigned to P1 issues a fetch from its current position. Records up to HW become visible.' },
+  { title:'9. Process & commit offset', text:'Consumer processes the record, then calls <code>commitSync()</code>. The Group Coordinator persists <code>{group, P1, offset:19}</code> to <code>__consumer_offsets</code>.' }
+];
+let lifeIdx = 0;
+function renderLife(){
+  const svg = document.getElementById('lifeSvg');
+  // base
+  svg.innerHTML = `
+    <rect x="20" y="120" width="120" height="60" rx="8" fill="#1c2a55" stroke="#7c9cff"/>
+    <text x="80" y="155" fill="#e6ecff" font-size="12" text-anchor="middle">Producer</text>
+
+    <rect x="200" y="120" width="120" height="60" rx="8" fill="#11304a" stroke="#5eead4"/>
+    <text x="260" y="155" fill="#e6ecff" font-size="12" text-anchor="middle">Leader (P1)</text>
+
+    <rect x="380" y="40" width="120" height="60" rx="8" fill="#11304a" stroke="#5eead4" opacity=".9"/>
+    <text x="440" y="75" fill="#e6ecff" font-size="12" text-anchor="middle">Follower 1</text>
+    <rect x="380" y="200" width="120" height="60" rx="8" fill="#11304a" stroke="#5eead4" opacity=".9"/>
+    <text x="440" y="235" fill="#e6ecff" font-size="12" text-anchor="middle">Follower 2</text>
+
+    <rect x="560" y="120" width="160" height="60" rx="8" fill="#3a1a2e" stroke="#f472b6"/>
+    <text x="640" y="148" fill="#e6ecff" font-size="12" text-anchor="middle">Consumer (group)</text>
+    <text x="640" y="166" fill="#9aa7d1" font-size="11" text-anchor="middle">billing</text>
+
+    <rect x="560" y="240" width="320" height="60" rx="8" fill="#241a4a" stroke="#a78bfa"/>
+    <text x="720" y="268" fill="#e6ecff" font-size="12" text-anchor="middle">Group Coordinator</text>
+    <text x="720" y="285" fill="#9aa7d1" font-size="11" text-anchor="middle">__consumer_offsets</text>
+  `;
+  const arrows = {
+    1: '<path d="M80 150 L80 120" stroke="#7c9cff" stroke-width="2" fill="none"/><text x="80" y="110" fill="#7c9cff" font-size="11" text-anchor="middle">send()</text>',
+    2: '<text x="80" y="110" fill="#7c9cff" font-size="11" text-anchor="middle">serialize + partition→P1</text>',
+    3: '<rect x="20" y="70" width="120" height="35" rx="6" fill="none" stroke="#fbbf24" stroke-dasharray="3 3"/><text x="80" y="92" fill="#fbbf24" font-size="11" text-anchor="middle">batch (linger.ms)</text>',
+    4: '<path d="M140 150 L200 150" stroke="#5eead4" stroke-width="2.5" fill="none" marker-end="url(#a1)"/>',
+    5: '<rect x="210" y="155" width="100" height="20" fill="#5b4416"/><text x="260" y="170" fill="#fde68a" font-size="11" text-anchor="middle">append off 19</text>',
+    6: '<path d="M320 140 L380 80" stroke="#5eead4" stroke-width="2" fill="none" marker-end="url(#a1)"/><path d="M320 160 L380 220" stroke="#5eead4" stroke-width="2" fill="none" marker-end="url(#a1)"/><text x="350" y="115" fill="#5eead4" font-size="11">fetch</text>',
+    7: '<path d="M380 70 L320 130" stroke="#34d399" stroke-width="2" fill="none" marker-end="url(#a2)"/><path d="M380 230 L320 170" stroke="#34d399" stroke-width="2" fill="none" marker-end="url(#a2)"/><path d="M200 150 L140 150" stroke="#34d399" stroke-width="2" fill="none" marker-end="url(#a2)"/><text x="170" y="140" fill="#34d399" font-size="11">ack</text>',
+    8: '<path d="M320 150 L560 150" stroke="#f472b6" stroke-width="2" fill="none" marker-end="url(#a3)"/><text x="440" y="142" fill="#f472b6" font-size="11" text-anchor="middle">fetch records</text>',
+    9: '<path d="M640 180 L640 240" stroke="#a78bfa" stroke-width="2" fill="none" marker-end="url(#a4)"/><text x="700" y="220" fill="#a78bfa" font-size="11">commit offset 19</text>'
+  };
+  let acc = '<defs>'+
+    '<marker id="a1" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#5eead4"/></marker>'+
+    '<marker id="a2" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#34d399"/></marker>'+
+    '<marker id="a3" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#f472b6"/></marker>'+
+    '<marker id="a4" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#a78bfa"/></marker>'+
+    '</defs>';
+  for(let i=1;i<=lifeIdx+1;i++){ if(arrows[i]) acc += arrows[i]; }
+  svg.insertAdjacentHTML('beforeend', acc);
+  document.getElementById('lifeStep').textContent = lifeIdx+1;
+  const s = lifeSteps[lifeIdx];
+  document.getElementById('lifeText').innerHTML = `<h3>${s.title}</h3><p>${s.text}</p>`;
+}
+document.getElementById('lifeNext').onclick = () => { lifeIdx = Math.min(lifeSteps.length-1, lifeIdx+1); renderLife(); };
+document.getElementById('lifePrev').onclick = () => { lifeIdx = Math.max(0, lifeIdx-1); renderLife(); };
+document.getElementById('lifeReset').onclick = () => { lifeIdx=0; renderLife(); };
+renderLife();
+</script>
+</body>
+</html>
