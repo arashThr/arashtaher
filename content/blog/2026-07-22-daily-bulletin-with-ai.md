@@ -1,5 +1,5 @@
 +++
-title = "Daily newspaper with AI"
+title = "Daily bulletin with AI"
 date = "2026-07-22T14:44:00.000Z"
 tags = [ "tech", "ai", "project", "rss" ]
 image = "/images/featured-1784758325498.webp"
@@ -11,7 +11,9 @@ The idea was to export all the feeds that I check daily on Inoreader and have a 
 
 After adding emails and events to the initial implementation, here's a sample of what gets automatically printed for me every morning:
 
-![1784757828197-daily.jpg](/images/1784757801148-daily.jpg)### How did I create the script
+![1784757828197-daily.jpg](/images/1784757801148-daily.jpg)
+
+### How do I create the bulletin
 
 Although these days the common wisdom is to start your projects in Codex or Claude Code and vibe with it, I prefer to start by working on a basic version by myself. Doing so, I can have a clear sense about how things work, how to guide the AI and the limitations of the implementation. When I have that semi-working version, I'd jump to my code harness to finish the job.
 
