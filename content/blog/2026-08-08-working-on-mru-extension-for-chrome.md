@@ -1,6 +1,6 @@
 +++
 title = "Working on MRU extension for Chrome"
-date = "2026-08-09T15:27:00.000Z"
+date = "2026-08-08T15:27:00.000Z"
 tags = [ "extensions", "web", "productivity" ]
 image = "/images/featured-1786307057365.webp"
 +++
