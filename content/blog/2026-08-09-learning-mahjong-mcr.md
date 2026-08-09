@@ -6,7 +6,9 @@ tags = [ "game", "reference", "learn", "mahjong" ]
 
 I realized we have a Mahjong place in Stockholm called [Tiger Mahjong](https://tigermahjong.com/). A few days ago, they posted a message on their Discord channel, looking for someone to fill a table. I, with a high level of confidence from one session of playing mahjong, decided to join. Although to be sure, I did check beforehand to see if beginners were welcome, and they said yes.
 
-![1786312539525-download-2.jpg](/images/1786312539525-download-2.jpg)Little did I know that even though the people were welcoming, the game was not! It was quite different from the mahjong I knew! This version was called MCR, and boy oh boy, it was complicated!
+![1786312539525-download-2.jpg](https://raw.githubusercontent.com/arashThr/arashtaher/main/static/images/1786312539525-download-2.jpg)
+
+Little did I know that even though the people were welcoming, the game was not! It was quite different from the mahjong I knew! This version was called MCR, and boy oh boy, it was complicated!
 
 I was handed a piece of paper filled with different rules, but I couldn't even understand what I was looking at! As I was trying to decipher the rules, people sat down at the table, and the game started.
 
