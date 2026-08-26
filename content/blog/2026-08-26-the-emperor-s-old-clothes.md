@@ -2,6 +2,7 @@
 title = "Agents and The Emperor's Old Clothes"
 date = "2026-08-26T18:08:00.000Z"
 tags = [ ]
+image = "/images/featured-1787768714404.webp"
 +++
 
 With the emergence of AI, I find myself going back time and time again to fundamentals.
