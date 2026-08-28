@@ -1,0 +1,456 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Emacs Cheat Sheet — Go / Eglot / Vertico+Corfu</title>
+<style>
+  :root {
+    --bg: #ffffff;
+    --fg: #1c1c1c;
+    --muted: #6b7280;
+    --rule: #e3e3e3;
+    --accent: #2b5797;
+    --chip: #f4f5f7;
+    --chipbd: #d8dade;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; padding: 24px 28px 60px;
+    background: var(--bg); color: var(--fg);
+    font: 14px/1.45 -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  }
+  header { border-bottom: 3px solid var(--fg); padding-bottom: 10px; margin-bottom: 18px; }
+  h1 { margin: 0 0 4px; font-size: 24px; letter-spacing: -.3px; }
+  .sub { color: var(--muted); font-size: 12.5px; }
+
+  .toolbar { display: flex; gap: 10px; align-items: center; margin: 16px 0 20px; flex-wrap: wrap; }
+  #q {
+    flex: 1 1 320px; min-width: 220px;
+    padding: 9px 12px; font-size: 14px;
+    border: 1px solid var(--chipbd); border-radius: 6px; outline: none;
+  }
+  #q:focus { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(43,87,151,.12); }
+  .tags { display: flex; gap: 6px; flex-wrap: wrap; }
+  .tag {
+    font-size: 12px; padding: 5px 10px; border-radius: 999px; cursor: pointer;
+    background: var(--chip); border: 1px solid var(--chipbd); color: #333; user-select: none;
+  }
+  .tag.active { background: var(--accent); border-color: var(--accent); color: #fff; }
+  #count { color: var(--muted); font-size: 12px; }
+
+  .grid { column-count: 2; column-gap: 26px; }
+  section {
+    break-inside: avoid; page-break-inside: avoid;
+    display: inline-block; width: 100%; margin: 0 0 18px;
+    border: 1px solid var(--rule); border-radius: 8px; overflow: hidden;
+  }
+  section h2 {
+    margin: 0; padding: 7px 11px; font-size: 12.5px;
+    text-transform: uppercase; letter-spacing: .8px;
+    background: var(--chip); border-bottom: 1px solid var(--rule);
+  }
+  table { width: 100%; border-collapse: collapse; }
+  tr { border-bottom: 1px solid #f0f0f0; }
+  tr:last-child { border-bottom: 0; }
+  td { padding: 4px 11px; vertical-align: top; }
+  td.k { width: 42%; white-space: nowrap; }
+  kbd {
+    font: 12px/1.3 "JetBrains Mono", "SF Mono", Menlo, Consolas, monospace;
+    background: #f6f7f9; border: 1px solid var(--chipbd);
+    border-bottom-width: 2px; border-radius: 4px; padding: 1px 5px; color: #111;
+  }
+  td.d { color: #333; font-size: 13px; }
+  .hide { display: none !important; }
+  .empty { color: var(--muted); padding: 30px 0; text-align: center; display: none; }
+
+  @media print {
+    @page { margin: 12mm; size: A4; }
+    body { padding: 0; font-size: 10.5px; }
+    .toolbar, .noprint { display: none !important; }
+    .grid { column-count: 2; column-gap: 8mm; }
+    h1 { font-size: 18px; }
+    kbd { font-size: 9.5px; border-bottom-width: 1px; }
+    td { padding: 2.5px 7px; }
+    section { border-color: #ccc; }
+    section h2 { background: #f0f0f0; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>Emacs Cheat Sheet</h1>
+  <div class="sub">Go &middot; Eglot &middot; Vertico / Consult / Corfu / Embark &middot; Magit &middot; Treemacs &middot; Org</div>
+</header>
+
+<div class="toolbar noprint">
+  <input id="q" type="search" placeholder="Search keys or actions…  (press /)" autocomplete="off">
+  <span id="count"></span>
+  <div class="tags" id="tags"></div>
+</div>
+
+<div class="grid" id="grid">
+
+<section data-cat="Essentials">
+  <h2>Essentials &amp; Help</h2>
+  <table>
+    <tr><td class="k"><kbd>C-g</kbd></td><td class="d">Cancel / dismiss popup</td></tr>
+    <tr><td class="k"><kbd>C-x C-c</kbd></td><td class="d">Quit Emacs</td></tr>
+    <tr><td class="k"><kbd>C-x C-f</kbd></td><td class="d">Find (open) file</td></tr>
+    <tr><td class="k"><kbd>C-x C-s</kbd></td><td class="d">Save buffer</td></tr>
+    <tr><td class="k"><kbd>C-x s</kbd></td><td class="d">Save all buffers</td></tr>
+    <tr><td class="k"><kbd>M-x</kbd></td><td class="d">Run command by name</td></tr>
+    <tr><td class="k"><kbd>C-h k</kbd></td><td class="d">Describe key</td></tr>
+    <tr><td class="k"><kbd>C-h f</kbd> / <kbd>C-h v</kbd></td><td class="d">Describe function / variable</td></tr>
+    <tr><td class="k"><kbd>C-h m</kbd></td><td class="d">Describe current modes</td></tr>
+    <tr><td class="k">which-key</td><td class="d">Waits 0.5s, then shows next keys</td></tr>
+    <tr><td class="k"><kbd>F1</kbd></td><td class="d">Open shell</td></tr>
+    <tr><td class="k"><kbd>F12</kbd></td><td class="d">todo-show</td></tr>
+  </table>
+</section>
+
+<section data-cat="Movement">
+  <h2>Movement</h2>
+  <table>
+    <tr><td class="k"><kbd>C-f</kbd> / <kbd>C-b</kbd></td><td class="d">Char forward / back</td></tr>
+    <tr><td class="k"><kbd>M-f</kbd> / <kbd>M-b</kbd></td><td class="d">Word forward / back</td></tr>
+    <tr><td class="k"><kbd>C-n</kbd> / <kbd>C-p</kbd></td><td class="d">Next / previous line</td></tr>
+    <tr><td class="k"><kbd>C-a</kbd> / <kbd>C-e</kbd></td><td class="d">Start / end of line</td></tr>
+    <tr><td class="k"><kbd>M-m</kbd></td><td class="d">Back to first non-blank char</td></tr>
+    <tr><td class="k"><kbd>M-a</kbd> / <kbd>M-e</kbd></td><td class="d">Start / end of sentence</td></tr>
+    <tr><td class="k"><kbd>M-&lt;</kbd> / <kbd>M-&gt;</kbd></td><td class="d">Start / end of buffer</td></tr>
+    <tr><td class="k"><kbd>C-v</kbd> / <kbd>M-v</kbd></td><td class="d">Page down / up</td></tr>
+    <tr><td class="k"><kbd>PgDn</kbd> / <kbd>PgUp</kbd></td><td class="d">Scroll <em>half</em> page (custom)</td></tr>
+    <tr><td class="k"><kbd>M-g g</kbd></td><td class="d">Go to line (consult)</td></tr>
+    <tr><td class="k"><kbd>C-u C-SPC</kbd></td><td class="d">Jump back through marks</td></tr>
+    <tr><td class="k"><kbd>M-g m</kbd></td><td class="d">Jump to mark (consult)</td></tr>
+  </table>
+</section>
+
+<section data-cat="Movement">
+  <h2>Avy — Fast Jump</h2>
+  <table>
+    <tr><td class="k"><kbd>M-j</kbd></td><td class="d">Jump to char in current line</td></tr>
+    <tr><td class="k"><kbd>M-J</kbd></td><td class="d">Jump by timed char sequence</td></tr>
+    <tr><td class="k"><kbd>M-g l</kbd></td><td class="d">Jump to line</td></tr>
+    <tr><td class="k"><kbd>M-g w</kbd></td><td class="d">Jump to word</td></tr>
+    <tr><td class="k"><kbd>M-g c</kbd></td><td class="d">Jump to char</td></tr>
+  </table>
+</section>
+
+<section data-cat="Editing">
+  <h2>Select, Kill &amp; Yank</h2>
+  <table>
+    <tr><td class="k"><kbd>C-SPC</kbd></td><td class="d">Set mark / start selection</td></tr>
+    <tr><td class="k"><kbd>C-x h</kbd></td><td class="d">Select whole buffer</td></tr>
+    <tr><td class="k"><kbd>C-w</kbd> / <kbd>M-w</kbd></td><td class="d">Cut / copy region</td></tr>
+    <tr><td class="k"><kbd>C-y</kbd></td><td class="d">Yank (paste)</td></tr>
+    <tr><td class="k"><kbd>M-y</kbd></td><td class="d">Yank history (consult-yank-pop)</td></tr>
+    <tr><td class="k"><kbd>C-k</kbd></td><td class="d">Kill whole line (configured)</td></tr>
+    <tr><td class="k"><kbd>M-d</kbd> / <kbd>M-DEL</kbd></td><td class="d">Kill word forward / back</td></tr>
+    <tr><td class="k"><kbd>C-=</kbd></td><td class="d">Expand region outward</td></tr>
+    <tr><td class="k"><kbd>M-;</kbd></td><td class="d">Comment / uncomment</td></tr>
+    <tr><td class="k"><kbd>M-/</kbd></td><td class="d">Dabbrev expand word</td></tr>
+    <tr><td class="k"><kbd>M-q</kbd></td><td class="d">Re-fill paragraph</td></tr>
+  </table>
+</section>
+
+<section data-cat="Editing">
+  <h2>Undo &amp; Multiple Cursors</h2>
+  <table>
+    <tr><td class="k"><kbd>C-/</kbd></td><td class="d">Undo</td></tr>
+    <tr><td class="k"><kbd>C-?</kbd></td><td class="d">Redo (undo-tree)</td></tr>
+    <tr><td class="k"><kbd>C-x u</kbd></td><td class="d">Visualize undo tree</td></tr>
+    <tr><td class="k"><kbd>C-&gt;</kbd></td><td class="d">Mark next like this</td></tr>
+    <tr><td class="k"><kbd>C-&lt;</kbd></td><td class="d">Mark previous like this</td></tr>
+    <tr><td class="k"><kbd>C-c C-&lt;</kbd></td><td class="d">Mark all like this</td></tr>
+    <tr><td class="k"><kbd>C-S-c C-S-c</kbd></td><td class="d">Cursor on each selected line</td></tr>
+    <tr><td class="k"><kbd>C-S-mouse-1</kbd></td><td class="d">Add cursor at click</td></tr>
+    <tr><td class="k"><kbd>C-c ;</kbd></td><td class="d">iedit — rename all occurrences</td></tr>
+  </table>
+</section>
+
+<section data-cat="Search">
+  <h2>Minibuffer &amp; History</h2>
+  <table>
+    <tr><td class="k"><kbd>M-p</kbd> / <kbd>M-n</kbd></td><td class="d">Previous / next history entry</td></tr>
+    <tr><td class="k"><kbd>M-n</kbd> (empty prompt)</td><td class="d">Insert symbol at point ("future history")</td></tr>
+    <tr><td class="k"><kbd>C-r</kbd> (in minibuffer)</td><td class="d">consult-history — searchable history list</td></tr>
+    <tr><td class="k"><kbd>C-x M-:</kbd></td><td class="d">Re-run a previous complex command</td></tr>
+    <tr><td class="k"><kbd>C-c C-e</kbd></td><td class="d">Embark export results to a buffer</td></tr>
+    <tr><td class="k"><kbd>C-.</kbd></td><td class="d">Embark act on current candidate</td></tr>
+    <tr><td class="k">wgrep</td><td class="d">Edit grep buffer, <kbd>C-c C-c</kbd> to apply</td></tr>
+    <tr><td class="k">savehist</td><td class="d">History persists across restarts</td></tr>
+  </table>
+</section>
+
+<section data-cat="Windows">
+  <h2>Windows &amp; Buffers</h2>
+  <table>
+    <tr><td class="k"><kbd>C-x 2</kbd> / <kbd>C-x 3</kbd></td><td class="d">Split below / right</td></tr>
+    <tr><td class="k"><kbd>C-x 1</kbd></td><td class="d">Only this window</td></tr>
+    <tr><td class="k"><kbd>C-x 0</kbd></td><td class="d">Delete this window</td></tr>
+    <tr><td class="k"><kbd>M-o</kbd></td><td class="d">Other window</td></tr>
+    <tr><td class="k"><kbd>M-0</kbd></td><td class="d">Delete window, or kill buffer if last</td></tr>
+    <tr><td class="k"><kbd>C-c &larr;</kbd> / <kbd>C-c &rarr;</kbd></td><td class="d">Winner undo / redo layout</td></tr>
+    <tr><td class="k"><kbd>C-x b</kbd></td><td class="d">Switch buffer (consult)</td></tr>
+    <tr><td class="k"><kbd>C-RET</kbd></td><td class="d">Switch buffer (consult)</td></tr>
+    <tr><td class="k"><kbd>C-x 4 b</kbd></td><td class="d">Buffer in other window</td></tr>
+    <tr><td class="k"><kbd>C-TAB</kbd></td><td class="d">Toggle last buffer</td></tr>
+    <tr><td class="k"><kbd>C-S-TAB</kbd></td><td class="d">Previous buffer</td></tr>
+    <tr><td class="k"><kbd>C-x k</kbd></td><td class="d">Kill buffer</td></tr>
+    <tr><td class="k"><kbd>C-x C-b</kbd></td><td class="d">Ibuffer (grouped)</td></tr>
+  </table>
+</section>
+
+<section data-cat="Search">
+  <h2>Search &amp; Consult</h2>
+  <table>
+    <tr><td class="k"><kbd>C-s</kbd> / <kbd>C-r</kbd></td><td class="d">Isearch forward / backward</td></tr>
+    <tr><td class="k"><kbd>C-s C-s</kbd></td><td class="d">Repeat last search string</td></tr>
+    <tr><td class="k"><kbd>C-s</kbd> at "Failing"</td><td class="d">Wrap around to top of buffer</td></tr>
+    <tr><td class="k">In isearch: <kbd>C-w</kbd></td><td class="d">Grow search by word at point</td></tr>
+    <tr><td class="k">In isearch: <kbd>M-s w</kbd></td><td class="d">Toggle word-boundary search</td></tr>
+    <tr><td class="k">In isearch: <kbd>M-s c</kbd></td><td class="d">Toggle case sensitivity</td></tr>
+    <tr><td class="k">In isearch: <kbd>M-s l</kbd></td><td class="d">Hand off to consult-line</td></tr>
+    <tr><td class="k">In isearch: <kbd>M-e</kbd></td><td class="d">Edit the search string</td></tr>
+    <tr><td class="k"><kbd>M-%</kbd> / <kbd>C-M-%</kbd></td><td class="d">Query replace / regexp</td></tr>
+    <tr><td class="k"><kbd>M-s l</kbd></td><td class="d">consult-line — whole buffer, any direction</td></tr>
+    <tr><td class="k"><kbd>M-s L</kbd></td><td class="d">consult-line-multi (all buffers)</td></tr>
+    <tr><td class="k"><kbd>M-s p</kbd></td><td class="d">consult-fd — find file by name</td></tr>
+    <tr><td class="k"><kbd>M-s g</kbd></td><td class="d">consult-grep</td></tr>
+    <tr><td class="k"><kbd>M-s r</kbd></td><td class="d">consult-ripgrep (fast)</td></tr>
+    <tr><td class="k"><kbd>M-g i</kbd></td><td class="d">consult-imenu — jump to symbol</td></tr>
+    <tr><td class="k"><kbd>&lt;</kbd></td><td class="d">Narrow key inside consult</td></tr>
+  </table>
+</section>
+
+<section data-cat="Completion">
+  <h2>Completion — Corfu &amp; Vertico</h2>
+  <table>
+    <tr><td class="k"><kbd>TAB</kbd></td><td class="d">Accept completion (Corfu)</td></tr>
+    <tr><td class="k"><kbd>RET</kbd></td><td class="d">Newline — never completes (fixed)</td></tr>
+    <tr><td class="k"><kbd>C-n</kbd> / <kbd>C-p</kbd></td><td class="d">Next / previous candidate</td></tr>
+    <tr><td class="k"><kbd>C-g</kbd></td><td class="d">Dismiss popup</td></tr>
+    <tr><td class="k"><kbd>C-M-i</kbd></td><td class="d">Trigger completion manually</td></tr>
+    <tr><td class="k"><kbd>M-d</kbd></td><td class="d">Show candidate documentation</td></tr>
+    <tr><td class="k">Vertico</td><td class="d">Type space-separated terms (orderless)</td></tr>
+    <tr><td class="k"><kbd>C-.</kbd></td><td class="d">Embark act on candidate</td></tr>
+    <tr><td class="k"><kbd>C-c C-e</kbd></td><td class="d">Embark export to editable buffer</td></tr>
+    <tr><td class="k">wgrep</td><td class="d">Edit grep results, then <kbd>C-c C-c</kbd></td></tr>
+  </table>
+</section>
+
+<section data-cat="LSP">
+  <h2>Eglot / LSP</h2>
+  <table>
+    <tr><td class="k"><kbd>M-.</kbd></td><td class="d">Go to definition</td></tr>
+    <tr><td class="k"><kbd>M-,</kbd></td><td class="d">Go back</td></tr>
+    <tr><td class="k"><kbd>M-?</kbd></td><td class="d">Find references</td></tr>
+    <tr><td class="k"><kbd>M-'</kbd></td><td class="d">Find implementation</td></tr>
+    <tr><td class="k"><kbd>C-c l i</kbd></td><td class="d">Find implementation</td></tr>
+    <tr><td class="k"><kbd>C-c l t</kbd></td><td class="d">Find type definition</td></tr>
+    <tr><td class="k"><kbd>C-c l a</kbd></td><td class="d">Code actions</td></tr>
+    <tr><td class="k"><kbd>C-c l r</kbd></td><td class="d">Rename symbol</td></tr>
+    <tr><td class="k"><kbd>C-c l f</kbd></td><td class="d">Format buffer</td></tr>
+    <tr><td class="k"><kbd>C-c l d</kbd></td><td class="d">Doc buffer (eldoc)</td></tr>
+    <tr><td class="k"><kbd>C-c l o</kbd></td><td class="d">Organize imports</td></tr>
+    <tr><td class="k">s-mouse-1</td><td class="d">Click-jump to definition</td></tr>
+  </table>
+</section>
+
+<section data-cat="LSP">
+  <h2>Diagnostics &amp; Spelling</h2>
+  <table>
+    <tr><td class="k"><kbd>M-n</kbd> / <kbd>M-p</kbd></td><td class="d">Next / previous flymake error</td></tr>
+    <tr><td class="k"><kbd>F8</kbd></td><td class="d">Toggle buffer diagnostics</td></tr>
+    <tr><td class="k"><kbd>S-F8</kbd></td><td class="d">Project diagnostics</td></tr>
+    <tr><td class="k"><kbd>M-$</kbd></td><td class="d">Correct word at point (flyspell)</td></tr>
+    <tr><td class="k"><kbd>M-TAB</kbd></td><td class="d">Flyspell correct previous word</td></tr>
+    <tr><td class="k"><kbd>M-x compile</kbd></td><td class="d">Compile; jumps to first error</td></tr>
+  </table>
+</section>
+
+<section data-cat="Project">
+  <h2>Project &amp; Treemacs</h2>
+  <table>
+    <tr><td class="k"><kbd>C-x p p</kbd></td><td class="d">Switch project → opens Dired (default)</td></tr>
+    <tr><td class="k"><kbd>C-x p p</kbd> then <kbd>f</kbd></td><td class="d">…find file instead</td></tr>
+    <tr><td class="k"><kbd>C-x p p</kbd> then <kbd>g</kbd></td><td class="d">…grep instead</td></tr>
+    <tr><td class="k"><kbd>C-c p l</kbd></td><td class="d">Lock / unlock project root (custom)</td></tr>
+    <tr><td class="k"><kbd>C-x p f</kbd></td><td class="d">Find file in project</td></tr>
+    <tr><td class="k"><kbd>C-x p g</kbd></td><td class="d">Grep in project</td></tr>
+    <tr><td class="k"><kbd>C-x p b</kbd></td><td class="d">Project buffers (consult)</td></tr>
+    <tr><td class="k"><kbd>C-x p d</kbd></td><td class="d">Dired in project root</td></tr>
+    <tr><td class="k"><kbd>C-x p D</kbd></td><td class="d">Dired in a project subdirectory</td></tr>
+    <tr><td class="k"><kbd>C-x p k</kbd></td><td class="d">Kill all project buffers</td></tr>
+    <tr><td class="k"><kbd>C-x p e</kbd></td><td class="d">Eshell in project root</td></tr>
+    <tr><td class="k"><kbd>C-x p c</kbd></td><td class="d">Compile in project root</td></tr>
+    <tr><td class="k"><kbd>C-c t t</kbd></td><td class="d">Toggle Treemacs</td></tr>
+    <tr><td class="k"><kbd>C-c t f</kbd></td><td class="d">Focus tree on current file</td></tr>
+    <tr><td class="k">In tree: <kbd>RET</kbd></td><td class="d">Open node</td></tr>
+    <tr><td class="k">In tree: <kbd>cf</kbd> / <kbd>cd</kbd></td><td class="d">Create file / directory</td></tr>
+    <tr><td class="k">In tree: <kbd>R</kbd> / <kbd>d</kbd></td><td class="d">Rename / delete</td></tr>
+  </table>
+</section>
+
+<section data-cat="Files">
+  <h2>Dired — Navigate &amp; Mark</h2>
+  <table>
+    <tr><td class="k"><kbd>C-x d</kbd></td><td class="d">Open Dired (prompts for dir)</td></tr>
+    <tr><td class="k"><kbd>C-x C-j</kbd></td><td class="d">Dired at current file (dired-jump)</td></tr>
+    <tr><td class="k"><kbd>RET</kbd> / <kbd>f</kbd></td><td class="d">Open file or directory</td></tr>
+    <tr><td class="k"><kbd>o</kbd> / <kbd>C-o</kbd></td><td class="d">Open in other window / display only</td></tr>
+    <tr><td class="k"><kbd>^</kbd></td><td class="d">Go to parent directory</td></tr>
+    <tr><td class="k"><kbd>i</kbd></td><td class="d">Insert subdirectory inline</td></tr>
+    <tr><td class="k"><kbd>g</kbd></td><td class="d">Refresh listing</td></tr>
+    <tr><td class="k"><kbd>q</kbd></td><td class="d">Quit window</td></tr>
+    <tr><td class="k"><kbd>m</kbd> / <kbd>u</kbd></td><td class="d">Mark / unmark file</td></tr>
+    <tr><td class="k"><kbd>U</kbd></td><td class="d">Unmark all</td></tr>
+    <tr><td class="k"><kbd>t</kbd></td><td class="d">Toggle all marks</td></tr>
+    <tr><td class="k"><kbd>* %</kbd></td><td class="d">Mark by regexp</td></tr>
+    <tr><td class="k"><kbd>* .</kbd></td><td class="d">Mark by extension</td></tr>
+    <tr><td class="k"><kbd>s</kbd></td><td class="d">Toggle sort: name / date</td></tr>
+    <tr><td class="k"><kbd>(</kbd></td><td class="d">Toggle detailed listing</td></tr>
+  </table>
+</section>
+
+<section data-cat="Files">
+  <h2>Dired — Create, Move &amp; Delete</h2>
+  <table>
+    <tr><td class="k"><kbd>+</kbd></td><td class="d">Create new directory</td></tr>
+    <tr><td class="k"><kbd>C-x C-f</kbd></td><td class="d">Create new file (just save a new name)</td></tr>
+    <tr><td class="k"><kbd>C</kbd></td><td class="d">Copy file(s) — prompts for dest</td></tr>
+    <tr><td class="k"><kbd>R</kbd></td><td class="d">Rename <em>or move</em> file(s)</td></tr>
+    <tr><td class="k"><kbd>d</kbd></td><td class="d">Flag for deletion (marks with D)</td></tr>
+    <tr><td class="k"><kbd>x</kbd></td><td class="d">Execute deletions of flagged files</td></tr>
+    <tr><td class="k"><kbd>D</kbd></td><td class="d">Delete immediately (with confirm)</td></tr>
+    <tr><td class="k"><kbd>~</kbd></td><td class="d">Flag all backup files (<code>~</code>)</td></tr>
+    <tr><td class="k"><kbd>S</kbd> / <kbd>H</kbd></td><td class="d">Symlink / hardlink</td></tr>
+    <tr><td class="k"><kbd>M</kbd></td><td class="d">Change file mode (chmod)</td></tr>
+    <tr><td class="k"><kbd>Z</kbd></td><td class="d">Compress / uncompress</td></tr>
+    <tr><td class="k"><kbd>!</kbd> / <kbd>&amp;</kbd></td><td class="d">Shell command on file, sync / async</td></tr>
+    <tr><td class="k"><kbd>C-x C-q</kbd></td><td class="d">wdired — edit names as text</td></tr>
+    <tr><td class="k">in wdired <kbd>C-c C-c</kbd></td><td class="d">Commit renames</td></tr>
+    <tr><td class="k">in wdired <kbd>C-c C-k</kbd></td><td class="d">Abort renames</td></tr>
+  </table>
+</section>
+
+<section data-cat="Git">
+  <h2>Magit &amp; Diff</h2>
+  <table>
+    <tr><td class="k"><kbd>C-x g</kbd></td><td class="d">Magit status</td></tr>
+    <tr><td class="k"><kbd>s</kbd> / <kbd>u</kbd></td><td class="d">Stage / unstage at point</td></tr>
+    <tr><td class="k"><kbd>S</kbd> / <kbd>U</kbd></td><td class="d">Stage all / unstage all</td></tr>
+    <tr><td class="k"><kbd>c c</kbd></td><td class="d">Commit (<kbd>C-c C-c</kbd> to confirm)</td></tr>
+    <tr><td class="k"><kbd>c a</kbd></td><td class="d">Amend commit</td></tr>
+    <tr><td class="k"><kbd>P p</kbd> / <kbd>F p</kbd></td><td class="d">Push / pull</td></tr>
+    <tr><td class="k"><kbd>b b</kbd> / <kbd>b c</kbd></td><td class="d">Checkout / create branch</td></tr>
+    <tr><td class="k"><kbd>l l</kbd></td><td class="d">Log current branch</td></tr>
+    <tr><td class="k"><kbd>d d</kbd></td><td class="d">Diff</td></tr>
+    <tr><td class="k"><kbd>r i</kbd></td><td class="d">Interactive rebase</td></tr>
+    <tr><td class="k"><kbd>z z</kbd> / <kbd>z p</kbd></td><td class="d">Stash / pop stash</td></tr>
+    <tr><td class="k"><kbd>TAB</kbd> / <kbd>q</kbd></td><td class="d">Expand section / quit</td></tr>
+    <tr><td class="k">diff-hl</td><td class="d">Fringe marks show uncommitted changes</td></tr>
+  </table>
+</section>
+
+<section data-cat="Org">
+  <h2>Org Mode</h2>
+  <table>
+    <tr><td class="k"><kbd>C-c a</kbd></td><td class="d">Org agenda</td></tr>
+    <tr><td class="k"><kbd>C-c c</kbd></td><td class="d">Org capture</td></tr>
+    <tr><td class="k"><kbd>C-c c b</kbd></td><td class="d">Capture: Backlog item</td></tr>
+    <tr><td class="k"><kbd>C-c c i</kbd></td><td class="d">Capture: Interrupt task</td></tr>
+    <tr><td class="k"><kbd>C-c c l</kbd></td><td class="d">Capture: Learning</td></tr>
+    <tr><td class="k"><kbd>TAB</kbd> / <kbd>S-TAB</kbd></td><td class="d">Cycle heading / global visibility</td></tr>
+    <tr><td class="k"><kbd>C-c C-t</kbd></td><td class="d">Cycle TODO state</td></tr>
+    <tr><td class="k"><kbd>C-c C-s</kbd> / <kbd>C-c C-d</kbd></td><td class="d">Schedule / deadline</td></tr>
+    <tr><td class="k"><kbd>C-c C-x C-i</kbd></td><td class="d">Clock in</td></tr>
+    <tr><td class="k"><kbd>C-c C-x C-o</kbd></td><td class="d">Clock out</td></tr>
+    <tr><td class="k"><kbd>M-&uarr;</kbd> / <kbd>M-&darr;</kbd></td><td class="d">Move subtree up / down</td></tr>
+    <tr><td class="k"><kbd>M-RET</kbd></td><td class="d">New heading / list item</td></tr>
+    <tr><td class="k"><kbd>C-c C-r</kbd></td><td class="d">Verb command map (HTTP requests)</td></tr>
+  </table>
+</section>
+
+<section data-cat="Misc">
+  <h2>Registers, Macros &amp; Misc</h2>
+  <table>
+    <tr><td class="k"><kbd>F6</kbd></td><td class="d">Load register (consult)</td></tr>
+    <tr><td class="k"><kbd>C-F6</kbd></td><td class="d">Store to register</td></tr>
+    <tr><td class="k"><kbd>M-F6</kbd></td><td class="d">Browse registers</td></tr>
+    <tr><td class="k"><kbd>C-x (</kbd> / <kbd>C-x )</kbd></td><td class="d">Start / end keyboard macro</td></tr>
+    <tr><td class="k"><kbd>C-x e</kbd></td><td class="d">Run last macro (repeat with <kbd>e</kbd>)</td></tr>
+    <tr><td class="k"><kbd>C-x d</kbd></td><td class="d">Dired</td></tr>
+    <tr><td class="k"><kbd>M-x world-clock</kbd></td><td class="d">Stockholm time</td></tr>
+    <tr><td class="k"><kbd>M-x ediff-buffers</kbd></td><td class="d">Side-by-side diff</td></tr>
+    <tr><td class="k">Markdown <kbd>M-&uarr;/&darr;</kbd></td><td class="d">Move block up / down</td></tr>
+  </table>
+</section>
+
+</div>
+
+<p class="empty" id="empty">No shortcuts match that search.</p>
+
+<script>
+(function () {
+  var grid = document.getElementById('grid');
+  var q = document.getElementById('q');
+  var tagBox = document.getElementById('tags');
+  var counter = document.getElementById('count');
+  var empty = document.getElementById('empty');
+  var sections = Array.prototype.slice.call(grid.querySelectorAll('section'));
+  var rows = Array.prototype.slice.call(grid.querySelectorAll('tr'));
+  var activeCat = null;
+
+  rows.forEach(function (r) { r.dataset.text = r.textContent.toLowerCase().replace(/\s+/g, ' '); });
+
+  var cats = [];
+  sections.forEach(function (s) {
+    if (cats.indexOf(s.dataset.cat) === -1) cats.push(s.dataset.cat);
+  });
+  cats.forEach(function (c) {
+    var b = document.createElement('span');
+    b.className = 'tag'; b.textContent = c;
+    b.onclick = function () {
+      activeCat = (activeCat === c) ? null : c;
+      Array.prototype.forEach.call(tagBox.children, function (el) {
+        el.classList.toggle('active', el.textContent === activeCat);
+      });
+      apply();
+    };
+    tagBox.appendChild(b);
+  });
+
+  function apply() {
+    var term = q.value.trim().toLowerCase();
+    var shown = 0;
+    sections.forEach(function (sec) {
+      var catOk = !activeCat || sec.dataset.cat === activeCat;
+      var visible = 0;
+      Array.prototype.forEach.call(sec.querySelectorAll('tr'), function (r) {
+        var ok = catOk && (!term || r.dataset.text.indexOf(term) !== -1);
+        r.classList.toggle('hide', !ok);
+        if (ok) visible++;
+      });
+      sec.classList.toggle('hide', visible === 0);
+      shown += visible;
+    });
+    counter.textContent = shown + ' shortcut' + (shown === 1 ? '' : 's');
+    empty.style.display = shown === 0 ? 'block' : 'none';
+  }
+
+  q.addEventListener('input', apply);
+  document.addEventListener('keydown', function (e) {
+    if (e.key === '/' && document.activeElement !== q) { e.preventDefault(); q.focus(); }
+    if (e.key === 'Escape') { q.value = ''; activeCat = null;
+      Array.prototype.forEach.call(tagBox.children, function (el) { el.classList.remove('active'); });
+      apply(); q.blur(); }
+  });
+  apply();
+})();
+</script>
+</body>
+</html>
