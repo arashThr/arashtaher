@@ -87,7 +87,7 @@ a {
       content: counter(page) "/" counter(pages);
     }
     @bottom-right {
-      content: "June 2026";
+      content: "Aug 2026";
     }
   }
 
