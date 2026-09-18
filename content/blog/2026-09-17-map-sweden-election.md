@@ -1,5 +1,5 @@
 +++
-title = "Interactive map of Stockholm's preliminary Riksdag result, district by district"
+title = "Interactive map of Stockholm's preliminary Riksdag result"
 date = "2026-09-17T20:58:00.000Z"
 tags = [ "sweden", "gis", "map", "ai" ]
 +++
@@ -25,6 +25,14 @@ So with this information, I decided to use an AI agent and see if making the map
 
 Nice thing about this map is that you can also export images.
 
-![1789750874092-stockholm-rd-2026-alla-andel.png](/images/1789750838559-stockholm-rd-2026-alla-andel.png)![1789750881173-stockholm-rd-2026-alla-avvikelse.png](/images/1789750855690-stockholm-rd-2026-alla-avvikelse.png)There is plenty you can read off the map. I will leave those interpretations to you. I hope you enjoy it.
+Here's the map of the distribution of votes in each district:
+
+![1789750874092-stockholm-rd-2026-alla-andel.png](/images/1789750838559-stockholm-rd-2026-alla-andel.png)
+
+And here's the average votes of each party compared the rest of the districts:
+
+![1789750881173-stockholm-rd-2026-alla-avvikelse.png](/images/1789750855690-stockholm-rd-2026-alla-avvikelse.png)
+
+There is plenty you can read off the map. I will leave those interpretations to you. I hope you enjoy it.
 
 Figures are preliminary (election-night count).
