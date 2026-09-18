@@ -22,7 +22,7 @@ This is a short summary of that journey: from knowing very little about running 
 There will be two parts:
 
 - In this post, I'll go through the resources I used to learn about neural networks, LLMs, and inference.
-- In the next post, I'll walk through building and optimizing the application.
+- In the [next post]({{< ref 2026-09-18-voice-assistant-part-2.md >}}), I'll walk through building and optimizing the application.
 
 The first thing I did was pick the paper that started all of this: "[**Attention Is All You Need**](https://arxiv.org/abs/1706.03762)." I used NotebookLM to go deep on it. Highly recommended. Reading that paper opened up a lot of questions, and from there I knew what to look for.
 
@@ -72,4 +72,4 @@ These were the most useful materials on that side:
   - [Moonshine Voice](https://github.com/moonshine-ai/moonshine)
   - [Silero VAD: pre-trained enterprise-grade Voice Activity Detector](https://github.com/snakers4/silero-vad)
 
-These resources did the most to get the theory off the ground. In the next post, I'll cover the process of building an optimized voice assistant.
+These resources did the most to get the theory off the ground. In the [next post]({{< ref 2026-09-18-voice-assistant-part-2.md >}}), I'll cover the process of building an optimized voice assistant.
