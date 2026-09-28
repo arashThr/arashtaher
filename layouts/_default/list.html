@@ -1,12 +1,12 @@
 {{ define "main" }}
 <content>
+  <h1 class="chrome-title">{{ .Title }}</h1>
   {{ if .Content }}
   <div>
     {{ .Content }}
   </div>
   {{ end }}
-  {{ if and .Data.Singular (ne .Kind "taxonomy") }}
-  <h3 class="chrome-title" style="margin-bottom:0.35rem">{{ .Title }}</h3>
+  {{ if and .Data.Singular (ne .Kind "taxonomy") (ne .Kind "section") }}
   <p class="muted">
     {{ if eq .Data.Singular "tag" }}
     <a href="{{ "tags" | relURL }}">All tags</a>
@@ -18,13 +18,13 @@
   <ul class="post-list">
     {{ range .Pages }}
     <li>
+      <a href="{{ .Permalink }}">{{ .Title }}</a>
       <time datetime='{{ .Date.Format "2006-01-02" }}'>
         {{ .Date.Format (default "02 Jan, 2006" .Site.Params.dateFormat) }}
       </time>
-      <a href="{{ .Permalink }}">{{ .Title }}</a>
     </li>
     {{ else }}
-    <li><span></span><span>No posts yet</span></li>
+    <li>No posts yet</li>
     {{ end }}
   </ul>
 </content>

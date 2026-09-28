@@ -4,7 +4,6 @@
   :root {
     --color-bg: #ffffff;
     --color-text: #000000;
-    --color-rule: #000000;
     --color-muted: #666666;
     --font-mono: "IBM Plex Mono", "SF Mono", "Cascadia Code", "Fira Code", ui-monospace, monospace;
     --max-width: 640px;
@@ -15,7 +14,6 @@
     :root {
       --color-bg: #000000;
       --color-text: #ffffff;
-      --color-rule: #ffffff;
       --color-muted: #999999;
     }
   }
@@ -85,7 +83,6 @@
     font-family: var(--font-mono);
   }
 
-  /* Chrome headings stay directory-style */
   header,
   section > h2,
   details summary,
@@ -99,7 +96,6 @@
     text-transform: uppercase;
   }
 
-  /* Long article titles should stay readable */
   main.post > h1 {
     text-transform: none;
     letter-spacing: 0;
@@ -138,20 +134,20 @@
     text-underline-offset: 2px;
   }
 
+  a:visited {
+    color: var(--color-muted);
+  }
+
   a:hover {
     text-decoration: none;
   }
 
   hr {
-    border: none;
-    border-top: 1px solid var(--color-rule);
-    margin: 2rem 0;
+    display: none;
   }
 
   header {
     margin-bottom: 2rem;
-    padding-bottom: 1.25rem;
-    border-bottom: 1px solid var(--color-rule);
   }
 
   header button {
@@ -173,6 +169,14 @@
     color: var(--color-muted);
   }
 
+  .social-links {
+    margin-top: 1rem;
+  }
+
+  main > div:first-child {
+    margin-bottom: 1rem;
+  }
+
   main > div:first-child h1 {
     margin-bottom: 0.35rem;
   }
@@ -188,8 +192,8 @@
 
   section {
     margin: 0;
-    padding: 2rem 0 0.25rem;
-    border-top: 1px solid var(--color-rule);
+    padding: 1.25rem 0 0;
+    border: none;
   }
 
   ul {
@@ -227,7 +231,7 @@
   }
 
   blockquote {
-    border-left: 1px solid var(--color-rule);
+    border-left: 1px solid var(--color-text);
     margin: 1.25rem 0;
     padding: 0.15rem 0 0.15rem 1rem;
     color: var(--color-muted);
@@ -244,7 +248,6 @@
   td {
     text-align: left;
     padding: 0.35rem 0.5rem 0.35rem 0;
-    border-bottom: 1px solid var(--color-rule);
     vertical-align: top;
   }
 
@@ -264,7 +267,6 @@
     padding: 1rem;
     overflow-x: auto;
     margin: 1.25rem 0;
-    border: 1px solid var(--color-rule);
     background: var(--bg-color-muted);
   }
 
@@ -293,7 +295,6 @@
     color: var(--color-muted);
   }
 
-  /* Blog / section listings: date column on the left */
   .post-list {
     list-style: none;
     margin: 0.5rem 0 0;
@@ -301,20 +302,25 @@
   }
 
   .post-list li {
-    display: grid;
-    grid-template-columns: 11.5ch minmax(0, 1fr);
-    column-gap: 1.25rem;
+    display: flex;
+    justify-content: space-between;
     align-items: baseline;
+    gap: 1.25rem;
     margin-bottom: 0.45rem;
+  }
+
+  .post-list a {
+    min-width: 0;
   }
 
   .post-list time {
     color: var(--color-muted);
     white-space: nowrap;
+    margin-left: auto;
+    flex-shrink: 0;
     font-variant-numeric: tabular-nums;
   }
 
-  /* Tag index: inline, no dates */
   .tag-cloud {
     display: flex;
     flex-wrap: wrap;
@@ -328,21 +334,8 @@
 
   footer {
     margin-top: 2.5rem;
-    padding-top: 1.25rem;
-    border-top: 1px solid var(--color-rule);
     font-size: 0.85rem;
     color: var(--color-muted);
-  }
-
-  footer a,
-  footer .sep {
-    color: var(--color-muted);
-  }
-
-  footer > div {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 0.25rem;
   }
 
   input,
@@ -371,7 +364,6 @@
     font-size: 14px;
   }
 
-  /* Google appointment widget */
   .appt-button {
     margin-top: 1.25rem;
   }
@@ -408,9 +400,7 @@
       grid-row: 1 / span 2;
       position: sticky;
       top: 2.75rem;
-      border-bottom: none;
       margin: 0;
-      padding: 0;
     }
 
     header nav {
@@ -420,6 +410,16 @@
     }
 
     header nav .sep {
+      display: none;
+    }
+
+    .social-links {
+      flex-direction: column;
+      align-items: flex-start;
+      margin-top: 1.5rem;
+    }
+
+    .social-links .sep {
       display: none;
     }
 
@@ -441,12 +441,6 @@
 
     ul {
       margin-left: 0;
-    }
-
-    .post-list li {
-      grid-template-columns: 1fr;
-      row-gap: 0.1rem;
-      margin-bottom: 0.85rem;
     }
   }
 </style>
