@@ -1,3 +1,4 @@
-{{ range .Site.Menus.main }}
-<a href="{{ .URL }}">{{ .Name }}</a>
+{{ range $i, $item := .Site.Menus.main }}
+{{- if $i }}<span class="sep">·</span>{{ end }}
+<a href="{{ $item.URL }}">{{ $item.Name }}</a>
 {{ end }}

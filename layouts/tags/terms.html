@@ -1,0 +1,9 @@
+{{ define "main" }}
+<h1 class="chrome-title">{{ .Title }}</h1>
+{{ with .Content }}<div>{{ . }}</div>{{ end }}
+<div class="tag-cloud">
+  {{ range .Pages.ByTitle }}
+  <a href="{{ .Permalink }}">{{ .Title }}</a>
+  {{ end }}
+</div>
+{{ end }}
