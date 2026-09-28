@@ -8,6 +8,7 @@
     --color-muted: #666666;
     --font-mono: "IBM Plex Mono", "SF Mono", "Cascadia Code", "Fira Code", ui-monospace, monospace;
     --max-width: 640px;
+    --nav-width: 9.5rem;
   }
 
   @media (prefers-color-scheme: dark) {
@@ -19,7 +20,6 @@
     }
   }
 
-  /* aliases used by existing templates */
   :root {
     --bg-color: var(--color-bg);
     --text-color: var(--color-text);
@@ -43,13 +43,24 @@
     -webkit-text-size-adjust: 100%;
   }
 
-  body {
+  html,
+  body,
+  main,
+  content,
+  article,
+  button,
+  input,
+  textarea,
+  select {
     font-family: var(--font-mono);
+  }
+
+  body {
     background: var(--color-bg);
     color: var(--color-text);
     max-width: var(--max-width);
     margin: 0 auto;
-    padding: 2rem 1rem;
+    padding: 2.5rem 1rem;
     line-height: 1.6;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
@@ -67,16 +78,33 @@
   h4,
   h5,
   h6 {
-    text-transform: uppercase;
     font-weight: 700;
     letter-spacing: 0.05em;
-    line-height: 1.2;
+    line-height: 1.3;
     color: var(--color-text);
+    font-family: var(--font-mono);
+  }
+
+  /* Chrome headings stay directory-style */
+  header,
+  section > h2,
+  details summary,
+  .chrome-title {
+    text-transform: uppercase;
   }
 
   h1 {
     font-size: 1.5rem;
     margin-bottom: 1rem;
+    text-transform: uppercase;
+  }
+
+  /* Long article titles should stay readable */
+  main.post > h1 {
+    text-transform: none;
+    letter-spacing: 0;
+    font-size: 1.35rem;
+    line-height: 1.35;
   }
 
   h2 {
@@ -84,14 +112,24 @@
     margin: 0 0 0.75rem;
   }
 
+  main.post h2,
+  content h2,
+  article h2 {
+    text-transform: none;
+    letter-spacing: 0;
+    margin: 2rem 0 0.75rem;
+  }
+
   h3,
   h4 {
     font-size: 1rem;
     margin: 1.5rem 0 0.75rem;
+    text-transform: none;
+    letter-spacing: 0;
   }
 
   p {
-    margin-bottom: 0.5rem;
+    margin-bottom: 0.85rem;
   }
 
   a {
@@ -107,13 +145,12 @@
   hr {
     border: none;
     border-top: 1px solid var(--color-rule);
-    margin: 1.5rem 0;
+    margin: 2rem 0;
   }
 
-  /* Header / nav — directory row */
   header {
-    margin-bottom: 1.5rem;
-    padding-bottom: 1rem;
+    margin-bottom: 2rem;
+    padding-bottom: 1.25rem;
     border-bottom: 1px solid var(--color-rule);
   }
 
@@ -125,7 +162,7 @@
   header nav {
     display: flex;
     flex-wrap: wrap;
-    gap: 0.25rem;
+    gap: 0.35rem 0.25rem;
     color: var(--color-muted);
   }
 
@@ -136,52 +173,51 @@
     color: var(--color-muted);
   }
 
-  /* Homepage hero */
   main > div:first-child h1 {
-    margin-bottom: 0.25rem;
+    margin-bottom: 0.35rem;
   }
 
   main > div:first-child p:first-of-type {
     color: var(--color-muted);
-    margin-bottom: 0.75rem;
+    margin-bottom: 0.85rem;
   }
 
   main > div:first-child p:nth-of-type(2) {
     margin-bottom: 0;
   }
 
-  /* Sections separated like pucek rules */
   section {
     margin: 0;
-    padding: 1.5rem 0 0;
+    padding: 2rem 0 0.25rem;
     border-top: 1px solid var(--color-rule);
-  }
-
-  section + section {
-    margin-top: 0;
   }
 
   ul {
     list-style: none;
     padding: 0;
-    margin: 0 0 0 1rem;
+    margin: 0 0 0.5rem 1rem;
   }
 
   li {
-    margin-bottom: 0.125rem;
+    margin-bottom: 0.2rem;
   }
 
-  /* Blog / list pages keep readable spacing */
-  content ul {
-    margin-top: 0.75rem;
+  content ul,
+  main.post ul,
+  article ul {
+    margin: 0.75rem 0 1rem 1.1rem;
+    list-style: disc;
   }
 
-  content p {
-    margin-bottom: 0.75rem;
+  content ol,
+  main.post ol {
+    margin: 0.75rem 0 1rem 1.25rem;
+    padding-left: 1rem;
   }
 
-  content li {
-    margin-bottom: 0.35rem;
+  content li,
+  main.post li {
+    margin-bottom: 0.4rem;
   }
 
   img {
@@ -192,47 +228,56 @@
 
   blockquote {
     border-left: 1px solid var(--color-rule);
-    margin: 1rem 0;
-    padding: 0.25rem 0 0.25rem 1rem;
+    margin: 1.25rem 0;
+    padding: 0.15rem 0 0.15rem 1rem;
     color: var(--color-muted);
   }
 
-  blockquote p:last-child {
-    margin-bottom: 0;
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 1rem 0 1.5rem;
+    font-size: 0.95em;
+  }
+
+  th,
+  td {
+    text-align: left;
+    padding: 0.35rem 0.5rem 0.35rem 0;
+    border-bottom: 1px solid var(--color-rule);
+    vertical-align: top;
   }
 
   code,
-  pre {
-    font-family: var(--font-mono);
-    font-size: 0.9em;
-    color: var(--color-text);
-    background: var(--bg-color-muted);
+  pre,
+  .hljs {
+    font-family: var(--font-mono) !important;
   }
 
   code {
+    font-size: 0.9em;
+    background: var(--bg-color-muted);
     padding: 0.1em 0.3em;
   }
 
   pre {
     padding: 1rem;
     overflow-x: auto;
-    margin: 1rem 0;
+    margin: 1.25rem 0;
     border: 1px solid var(--color-rule);
+    background: var(--bg-color-muted);
   }
 
-  pre code {
-    background: transparent;
+  pre code,
+  pre .hljs {
+    background: transparent !important;
     padding: 0;
-    font-size: 1em;
-  }
-
-  details {
-    margin: 0;
+    font-size: 0.9em;
+    color: inherit;
   }
 
   details summary {
     cursor: pointer;
-    text-transform: uppercase;
     font-weight: 700;
     letter-spacing: 0.05em;
     margin-bottom: 0.75rem;
@@ -243,13 +288,47 @@
     color: var(--color-bg);
   }
 
-  .muted {
+  .muted,
+  .post-date {
+    color: var(--color-muted);
+  }
+
+  /* Blog / section listings: date column on the left */
+  .post-list {
+    list-style: none;
+    margin: 0.5rem 0 0;
+    padding: 0;
+  }
+
+  .post-list li {
+    display: grid;
+    grid-template-columns: 11.5ch minmax(0, 1fr);
+    column-gap: 1.25rem;
+    align-items: baseline;
+    margin-bottom: 0.45rem;
+  }
+
+  .post-list time {
+    color: var(--color-muted);
+    white-space: nowrap;
+    font-variant-numeric: tabular-nums;
+  }
+
+  /* Tag index: inline, no dates */
+  .tag-cloud {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.35rem 1.1rem;
+    margin-top: 1rem;
+  }
+
+  .tag-cloud a {
     color: var(--color-muted);
   }
 
   footer {
-    margin-top: 2rem;
-    padding-top: 1rem;
+    margin-top: 2.5rem;
+    padding-top: 1.25rem;
     border-top: 1px solid var(--color-rule);
     font-size: 0.85rem;
     color: var(--color-muted);
@@ -266,15 +345,6 @@
     gap: 0.25rem;
   }
 
-  /* Forms (contact / newsletter) */
-  input,
-  textarea,
-  select,
-  button {
-    font-family: var(--font-mono);
-    font-size: 14px;
-  }
-
   input,
   textarea,
   select {
@@ -284,6 +354,7 @@
     border-radius: 0;
     background: transparent;
     color: var(--color-text);
+    font-size: 14px;
   }
 
   button,
@@ -297,6 +368,70 @@
     background: var(--color-text);
     color: var(--color-bg);
     cursor: pointer;
+    font-size: 14px;
+  }
+
+  /* Google appointment widget */
+  .appt-button {
+    margin-top: 1.25rem;
+  }
+
+  .appt-button button,
+  .appt-button a,
+  .appt-button [role="button"] {
+    background: var(--color-text) !important;
+    color: var(--color-bg) !important;
+    border: none !important;
+    border-radius: 0 !important;
+    box-shadow: none !important;
+    font-family: var(--font-mono) !important;
+    font-size: 14px !important;
+    font-weight: 700 !important;
+    text-transform: uppercase !important;
+    letter-spacing: 0.05em !important;
+    padding: 0.7rem 1rem !important;
+  }
+
+  @media (min-width: 900px) {
+    body {
+      display: grid;
+      grid-template-columns: var(--nav-width) minmax(0, var(--max-width));
+      justify-content: center;
+      column-gap: 3rem;
+      max-width: none;
+      padding: 2.75rem 2rem 4rem;
+      align-items: start;
+    }
+
+    header {
+      grid-column: 1;
+      grid-row: 1 / span 2;
+      position: sticky;
+      top: 2.75rem;
+      border-bottom: none;
+      margin: 0;
+      padding: 0;
+    }
+
+    header nav {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 0.4rem;
+    }
+
+    header nav .sep {
+      display: none;
+    }
+
+    main {
+      grid-column: 2;
+      grid-row: 1;
+    }
+
+    footer {
+      grid-column: 2;
+      grid-row: 2;
+    }
   }
 
   @media (max-width: 480px) {
@@ -306,6 +441,12 @@
 
     ul {
       margin-left: 0;
+    }
+
+    .post-list li {
+      grid-template-columns: 1fr;
+      row-gap: 0.1rem;
+      margin-bottom: 0.85rem;
     }
   }
 </style>

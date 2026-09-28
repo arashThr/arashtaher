@@ -5,26 +5,26 @@
     {{ .Content }}
   </div>
   {{ end }}
-  {{ if .Data.Singular }}
-  <h3 style="margin-bottom:0">Filtering for "{{ .Title }}"</h3>
-  <small>
-    <a href="{{ "blog" | relURL }}">Remove filter</a>
-  </small>
+  {{ if and .Data.Singular (ne .Kind "taxonomy") }}
+  <h3 class="chrome-title" style="margin-bottom:0.35rem">{{ .Title }}</h3>
+  <p class="muted">
+    {{ if eq .Data.Singular "tag" }}
+    <a href="{{ "tags" | relURL }}">All tags</a>
+    {{ else }}
+    <a href="{{ "blog" | relURL }}">All posts</a>
+    {{ end }}
+  </p>
   {{ end }}
-  <ul>
+  <ul class="post-list">
     {{ range .Pages }}
     <li>
+      <time datetime='{{ .Date.Format "2006-01-02" }}'>
+        {{ .Date.Format (default "02 Jan, 2006" .Site.Params.dateFormat) }}
+      </time>
       <a href="{{ .Permalink }}">{{ .Title }}</a>
-      <span style="color: var(--meta-color); font-size: 0.85em; margin-left: 0.5rem; white-space: nowrap;">
-        <time datetime='{{ .Date.Format "2006-01-02" }}'>
-          {{ .Date.Format (default "02 Jan, 2006" .Site.Params.dateFormat) }}
-        </time>
-      </span>
     </li>
     {{ else }}
-    <li>
-      No posts yet
-    </li>
+    <li><span></span><span>No posts yet</span></li>
     {{ end }}
   </ul>
 </content>
