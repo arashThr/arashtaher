@@ -1,7 +1,14 @@
 {{ define "main" }}
 <div>
   <h1>Arash Taher</h1>
-  <p>Software Engineer • Stockholm, Sweden</p>
+  <p class="social-links">
+    <a href="https://github.com/arashthr" target="_blank" rel="noopener">GitHub</a>
+    <span class="sep">·</span>
+    <a href="https://x.com/rshthr" target="_blank" rel="noopener">X</a>
+    <span class="sep">·</span>
+    <a href="https://www.linkedin.com/in/arashtaher/" target="_blank" rel="noopener">LinkedIn</a>
+  </p>
+  <p class="muted">Software Engineer • Stockholm, Sweden</p>
   <p>I build scalable software solutions and create meaningful digital experiences.</p>
 </div>
 
@@ -56,23 +63,9 @@
       <li>you're going to a <b>LOTR</b> marathon</li>
     </ul>
   </details>
-  <div class="appt-button">
-    <link href="https://calendar.google.com/calendar/scheduling-button-script.css" rel="stylesheet">
-    <script src="https://calendar.google.com/calendar/scheduling-button-script.js" async></script>
-    <script>
-      (function () {
-        var target = document.currentScript;
-        window.addEventListener('load', function () {
-          calendar.schedulingButton.load({
-            url: 'https://calendar.google.com/calendar/appointments/schedules/AcZssZ0AAcLjaHO1_RkwX7WbviJ3_SKbncFOR9ngjliydTnFA-BKaCwuXX7AyiRJ-n0ouR7j7Ua4bSAz?gv=true',
-            color: '#000000',
-            label: 'Book an appointment',
-            target,
-          });
-        });
-      })();
-    </script>
-  </div>
+  <p class="appt-button">
+    <a href="https://calendar.google.com/calendar/appointments/schedules/AcZssZ0AAcLjaHO1_RkwX7WbviJ3_SKbncFOR9ngjliydTnFA-BKaCwuXX7AyiRJ-n0ouR7j7Ua4bSAz?gv=true">Book an appointment</a>
+  </p>
 </section>
 
 <section>

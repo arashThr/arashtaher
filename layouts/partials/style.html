@@ -170,7 +170,13 @@
   }
 
   .social-links {
-    margin-top: 1rem;
+    color: var(--color-muted);
+    margin: 0.15rem 0 0.75rem;
+  }
+
+  .social-links a,
+  .social-links .sep {
+    color: var(--color-muted);
   }
 
   main > div:first-child {
@@ -178,16 +184,7 @@
   }
 
   main > div:first-child h1 {
-    margin-bottom: 0.35rem;
-  }
-
-  main > div:first-child p:first-of-type {
-    color: var(--color-muted);
-    margin-bottom: 0.85rem;
-  }
-
-  main > div:first-child p:nth-of-type(2) {
-    margin-bottom: 0;
+    margin-bottom: 0.25rem;
   }
 
   section {
@@ -365,23 +362,25 @@
   }
 
   .appt-button {
-    margin-top: 1.25rem;
+    margin-top: 1rem;
   }
 
-  .appt-button button,
-  .appt-button a,
-  .appt-button [role="button"] {
-    background: var(--color-text) !important;
-    color: var(--color-bg) !important;
-    border: none !important;
-    border-radius: 0 !important;
-    box-shadow: none !important;
-    font-family: var(--font-mono) !important;
-    font-size: 14px !important;
-    font-weight: 700 !important;
-    text-transform: uppercase !important;
-    letter-spacing: 0.05em !important;
-    padding: 0.7rem 1rem !important;
+  .appt-button a {
+    background: transparent;
+    color: var(--color-text);
+    text-decoration: underline;
+    text-underline-offset: 2px;
+    font-weight: 400;
+    text-transform: none;
+    letter-spacing: 0;
+    padding: 0;
+    box-shadow: none;
+  }
+
+  .appt-button a:hover {
+    background: var(--color-text);
+    color: var(--color-bg);
+    text-decoration: none;
   }
 
   @media (min-width: 900px) {
@@ -410,16 +409,6 @@
     }
 
     header nav .sep {
-      display: none;
-    }
-
-    .social-links {
-      flex-direction: column;
-      align-items: flex-start;
-      margin-top: 1.5rem;
-    }
-
-    .social-links .sep {
       display: none;
     }
 
