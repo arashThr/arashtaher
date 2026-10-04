@@ -1,0 +1,680 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#faf9f5;color:#141413}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>SSTable Storage Walkthrough</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Sans+Condensed:wght@600&display=swap">
+<style>
+/* layout: operator console pinned on the left, storage stack on the right (RAM above disk, newest file above oldest) */
+:root{
+  --bg:#e9eef0; --surface:#f8fafa; --surface-2:#dde5e8; --ink:#14232a; --ink-2:#4a5d66; --line:#c1cdd2;
+  --accent:#0a6b7c; --accent-ink:#ffffff; --accent-soft:#cfe8ed;
+  --ok:#22693a; --ok-soft:#d3ecd9; --warn:#8a5600; --warn-soft:#f5e4c0; --bad:#a52c43; --bad-soft:#f6d9df;
+  --console-bg:#14232a; --console-fg:#e6eef0; --console-dim:#9fb3bb; --console-line:#33474f; --console-accent:#6fd0de; --console-accent-ink:#06222a;
+  --shadow:rgba(20,35,42,.22);
+  --font-display:"IBM Plex Sans Condensed","Arial Narrow",system-ui,sans-serif;
+  --font-body:"IBM Plex Sans",system-ui,-apple-system,"Segoe UI",sans-serif;
+  --font-mono:"IBM Plex Mono",ui-monospace,"SF Mono",Menlo,Consolas,monospace;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#0f181c; --surface:#172329; --surface-2:#22323a; --ink:#e3ecef; --ink-2:#9db0b8; --line:#34474f;
+    --accent:#5cc8d8; --accent-ink:#06222a; --accent-soft:#17424c;
+    --ok:#7fd192; --ok-soft:#183b24; --warn:#e8b85a; --warn-soft:#3e3010; --bad:#f2909f; --bad-soft:#47212b;
+    --console-bg:#22363e; --console-fg:#e6eef0; --console-dim:#a5b8bf; --console-line:#3f565f; --console-accent:#6fd0de; --console-accent-ink:#06222a;
+    --shadow:rgba(0,0,0,.5);
+    color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#0f181c; --surface:#172329; --surface-2:#22323a; --ink:#e3ecef; --ink-2:#9db0b8; --line:#34474f;
+  --accent:#5cc8d8; --accent-ink:#06222a; --accent-soft:#17424c;
+  --ok:#7fd192; --ok-soft:#183b24; --warn:#e8b85a; --warn-soft:#3e3010; --bad:#f2909f; --bad-soft:#47212b;
+  --console-bg:#22363e; --console-fg:#e6eef0; --console-dim:#a5b8bf; --console-line:#3f565f; --console-accent:#6fd0de; --console-accent-ink:#06222a;
+  --shadow:rgba(0,0,0,.5);
+  color-scheme:dark;
+}
+
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--ink);font-family:var(--font-body);font-size:15px;line-height:1.5}
+h1,h2,h3,p,ul,ol{margin:0}
+ul,ol{padding:0;list-style:none}
+button,input{font:inherit;color:inherit}
+code,pre{font-family:var(--font-mono)}
+
+.page{max-width:78rem;margin-inline:auto;padding-inline:clamp(16px,3vw,32px);padding-block:1.75rem 3.5rem;display:flex;flex-direction:column;gap:1.5rem}
+
+.top{display:flex;flex-direction:column;gap:.6rem}
+.top h1{font-family:var(--font-display);font-weight:600;font-size:clamp(1.8rem,4.2vw,2.5rem);line-height:1.08;letter-spacing:-.01em;text-wrap:balance}
+.lede{max-width:68ch;font-size:1.02rem}
+.scale{max-width:68ch;color:var(--ink-2);font-size:.88rem}
+
+.cap{font-size:.7rem;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--ink-2)}
+.cap small{font-size:inherit;font-weight:400;letter-spacing:.04em;text-transform:none}
+
+/* ---------- layout ---------- */
+.layout{display:grid;grid-template-columns:minmax(0,21.5rem) minmax(0,1fr);gap:1.25rem;align-items:start}
+.side{position:sticky;top:calc(env(safe-area-inset-top,0px) + .75rem);display:flex;flex-direction:column;gap:.75rem;max-height:calc(100vh - 1.5rem);overflow:auto}
+.store{display:flex;flex-direction:column;gap:1rem;min-width:0}
+
+/* ---------- console (operations) ---------- */
+.console{background:var(--surface);border:1px solid var(--line);border-radius:4px;padding:.85rem;display:flex;flex-direction:column;gap:.8rem}
+.console form{display:flex;flex-direction:column;gap:.4rem}
+.fields{display:grid;grid-template-columns:minmax(0,3fr) minmax(0,2fr);gap:.4rem}
+.field{display:flex;flex-direction:column;gap:.15rem;min-width:0}
+.field label{font-size:.72rem;color:var(--ink-2)}
+.console input[type="text"]{width:100%;min-width:0;padding:.4rem .5rem;border:1px solid var(--line);border-radius:3px;background:var(--bg);font-family:var(--font-mono);font-size:.85rem}
+.btnrow{display:flex;flex-wrap:wrap;gap:.4rem}
+.btn{padding:.4rem .7rem;border:1px solid var(--line);border-radius:3px;background:var(--surface-2);font-size:.85rem;font-weight:500;cursor:pointer;line-height:1.2}
+.btn:hover{border-color:var(--accent)}
+.btn.primary{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
+.btn:disabled{opacity:.45;cursor:default}
+.btn:focus-visible,.console input:focus-visible,.chip:focus-visible,.trace button:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.tries{display:flex;flex-direction:column;gap:.35rem}
+.chips{display:flex;flex-wrap:wrap;gap:.3rem}
+.chip{border:1px solid var(--line);background:transparent;border-radius:999px;padding:.18rem .6rem;font-size:.78rem;cursor:pointer;text-align:left}
+.chip b{font-family:var(--font-mono);font-weight:500}
+.chip span{color:var(--ink-2)}
+.chip:hover{border-color:var(--accent);background:var(--accent-soft)}
+.check{display:flex;gap:.45rem;align-items:center;font-size:.82rem;color:var(--ink-2)}
+.check input{accent-color:var(--accent)}
+.err{color:var(--bad);font-size:.82rem}
+.sep{border:0;border-top:1px solid var(--line);margin:0}
+
+/* ---------- stepper: the one loud element ---------- */
+.stepper{background:var(--console-bg);color:var(--console-fg);border-radius:4px;padding:.85rem;display:flex;flex-direction:column;gap:.6rem}
+.stepper-head{display:flex;flex-wrap:wrap;align-items:baseline;justify-content:space-between;gap:.25rem .75rem}
+.op-title{font-family:var(--font-mono);font-weight:600;font-size:.95rem;overflow-wrap:anywhere}
+.count{font-size:.75rem;color:var(--console-dim);font-variant-numeric:tabular-nums}
+.stepper .btn{background:transparent;border-color:var(--console-line);color:var(--console-fg)}
+.stepper .btn:hover:not(:disabled){border-color:var(--console-accent)}
+.stepper .btn.primary{background:var(--console-accent);border-color:var(--console-accent);color:var(--console-accent-ink);font-weight:600}
+.stepper .btn:focus-visible{outline-color:var(--console-accent)}
+.step-text{font-size:.9rem;line-height:1.5}
+.step-text code{color:var(--console-accent);font-size:.92em}
+.result{font-family:var(--font-mono);font-size:.82rem;padding:.4rem .55rem;border-radius:3px;border:1px solid var(--console-line);overflow-wrap:anywhere}
+.result.r-found{border-color:var(--console-accent);color:var(--console-accent)}
+.keys-hint{font-size:.72rem;color:var(--console-dim)}
+
+.trace{background:var(--surface);border:1px solid var(--line);border-radius:4px;padding:.6rem .85rem .75rem;display:flex;flex-direction:column;gap:.4rem}
+.trace ol{display:flex;flex-direction:column;counter-reset:st}
+.trace li{counter-increment:st;display:flex;gap:.5rem;align-items:baseline}
+.trace li::before{content:counter(st);font-size:.72rem;color:var(--ink-2);font-variant-numeric:tabular-nums;min-width:1.1em;text-align:right}
+.trace button{border:0;background:transparent;padding:.14rem .3rem;border-radius:3px;font-size:.82rem;text-align:left;cursor:pointer;color:var(--ink-2);overflow-wrap:anywhere}
+.trace button:hover{color:var(--ink)}
+.trace li.cur button{color:var(--ink);font-weight:600;background:var(--accent-soft)}
+.trace code{font-size:.92em}
+
+/* ---------- storage ---------- */
+.zone{border:1.5px solid var(--line);border-radius:4px;padding:.85rem;display:flex;flex-direction:column;gap:.8rem;min-width:0}
+.zone.ram{border-style:dashed}
+.zone-head{display:flex;flex-wrap:wrap;align-items:baseline;gap:.2rem .7rem}
+.zone-head h2{font-family:var(--font-display);font-size:1.15rem;font-weight:600;letter-spacing:.02em}
+.zone-head p{font-size:.82rem;color:var(--ink-2)}
+
+.panel{background:var(--surface);border:1px solid var(--line);border-radius:3px;padding:.65rem .75rem;display:flex;flex-direction:column;gap:.5rem;min-width:0;scroll-margin:1rem}
+.panel-head{display:flex;flex-wrap:wrap;align-items:center;gap:.3rem .6rem}
+.fname{font-family:var(--font-mono);font-weight:600;font-size:.88rem}
+.meta{font-size:.78rem;color:var(--ink-2)}
+.tag{font-size:.68rem;font-weight:600;letter-spacing:.05em;text-transform:uppercase;padding:.08rem .4rem;border-radius:2px;border:1px solid var(--line);color:var(--ink-2)}
+.tag.t-miss,.tag.t-skip{border-color:var(--warn);color:var(--warn);background:var(--warn-soft)}
+.tag.t-hit{border-color:var(--ok);color:var(--ok);background:var(--ok-soft)}
+.tag.t-tomb{border-color:var(--bad);color:var(--bad);background:var(--bad-soft)}
+.tag.t-new{border-color:var(--accent);color:var(--accent);background:var(--accent-soft)}
+
+.ramrow{display:flex;flex-wrap:wrap;gap:.8rem}
+.ramrow .panel{flex:1 1 17rem}
+.ramnote{flex:1 1 13rem;font-size:.84rem;color:var(--ink-2);min-width:0;align-self:center}
+.meter{display:inline-flex;gap:2px;vertical-align:middle}
+.meter i{width:.55rem;height:.7rem;border:1px solid var(--ink-2);border-radius:1px}
+.meter i.on{background:var(--accent);border-color:var(--accent)}
+
+.recs{display:flex;flex-direction:column;gap:2px}
+.rec{display:grid;grid-template-columns:minmax(0,1fr) auto auto;gap:.6rem;align-items:baseline;padding:.16rem .4rem;border-radius:2px;font-family:var(--font-mono);font-size:.8rem;outline:1.5px solid transparent;outline-offset:-1.5px}
+.rk{overflow-wrap:anywhere;font-weight:500}
+.rv{color:var(--ink-2);font-variant-numeric:tabular-nums;overflow-wrap:anywhere}
+.rv.tomb{color:var(--bad);font-style:italic}
+.rt{font-family:var(--font-body);font-size:.64rem;font-weight:600;letter-spacing:.05em;text-transform:uppercase}
+.rec.is-new,.rec.is-flush{background:var(--accent-soft)}
+.rec.is-new{outline-color:var(--accent)}
+.rec.is-new .rt,.rec.is-flush .rt,.rec.is-head .rt{color:var(--accent)}
+.rec.is-hit,.rec.is-pick{background:var(--ok-soft);outline-color:var(--ok)}
+.rec.is-hit .rt,.rec.is-pick .rt{color:var(--ok)}
+.rec.is-tomb,.rec.is-drop{background:var(--bad-soft)}
+.rec.is-tomb{outline-color:var(--bad)}
+.rec.is-tomb .rt,.rec.is-drop .rt{color:var(--bad)}
+.rec.is-drop .rk,.rec.is-drop .rv{text-decoration:line-through}
+.rec.is-lt{background:var(--surface-2)}
+.rec.is-lt .rt{color:var(--ink-2)}
+.rec.is-gt{background:var(--warn-soft);outline-color:var(--warn)}
+.rec.is-gt .rt{color:var(--warn)}
+.rec.is-head{outline:1.5px dashed var(--accent)}
+.rec.is-done{opacity:.38}
+.empty{font-size:.82rem;color:var(--ink-2);font-style:italic}
+
+.wal{display:flex;flex-wrap:wrap;gap:.3rem}
+.walrec{font-family:var(--font-mono);font-size:.78rem;padding:.1rem .45rem;border:1px solid var(--line);border-radius:2px;overflow-wrap:anywhere;min-width:0}
+.walrec.is-new{background:var(--accent-soft);border-color:var(--accent)}
+
+.readorder{display:flex;align-items:center;gap:.6rem;font-size:.8rem;color:var(--ink-2)}
+.readorder::after{content:"";flex:1;border-top:1px solid var(--line)}
+
+.seg.is-focus,.panel.is-focus{border-color:var(--accent);box-shadow:0 0 0 2px var(--accent-soft)}
+.seg.building{border-style:dashed}
+.seg-body{display:flex;flex-wrap:wrap;gap:.8rem}
+.sindex{flex:0 1 12.5rem;display:flex;flex-direction:column;gap:.3rem;min-width:0}
+.sindex table{border-collapse:collapse;font-family:var(--font-mono);font-size:.8rem;width:100%}
+.sindex td{padding:.16rem .4rem;border-bottom:1px solid var(--line)}
+.sindex td.off{text-align:right;color:var(--ink-2);font-variant-numeric:tabular-nums;white-space:nowrap}
+.sindex tr.is-active td{background:var(--accent-soft);font-weight:600;color:var(--ink)}
+.sindex tr.is-all td{background:var(--accent-soft)}
+.datafile{flex:1 1 15rem;display:flex;flex-direction:column;gap:.3rem;min-width:0}
+.blocks{display:flex;flex-wrap:wrap;gap:.5rem}
+.block{flex:1 1 15rem;min-width:0;border:1px solid var(--line);border-radius:3px;padding:.3rem;display:flex;flex-direction:column;gap:.25rem;background:var(--bg)}
+.block.is-active{border-color:var(--accent);box-shadow:0 0 0 2px var(--accent-soft)}
+.boff{font-size:.68rem;color:var(--ink-2);padding-inline:.4rem;font-variant-numeric:tabular-nums}
+
+/* ---------- notes ---------- */
+.notes{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,19rem),1fr));gap:1.5rem 2rem;border-top:1px solid var(--line);padding-top:1.5rem}
+.notes h2{font-family:var(--font-display);font-weight:600;font-size:1.2rem;line-height:1.2;text-wrap:balance;margin-bottom:.4rem}
+.notes p{max-width:65ch}
+.notes p + p{margin-top:.5rem}
+.notes ul{display:flex;flex-direction:column;gap:.35rem;list-style:disc;padding-left:1.1rem;max-width:65ch}
+.notes code{font-size:.9em}
+.wide{grid-column:1/-1;min-width:0}
+.codewrap{overflow-x:auto;background:var(--console-bg);color:var(--console-fg);border-radius:4px;padding:.9rem 1rem;margin-top:.6rem}
+.codewrap pre{margin:0;font-size:.82rem;line-height:1.55}
+.codewrap .c{color:var(--console-dim)}
+
+@media (max-width:860px){
+  .layout{display:flex;flex-direction:column}
+  .side{display:contents}
+  .console{order:1}
+  .store{order:2}
+  .trace{order:3}
+  .stepper{order:4;position:sticky;bottom:calc(env(safe-area-inset-bottom,0px) + 8px);max-height:44vh;overflow:auto;box-shadow:0 6px 22px var(--shadow)}
+  .keys-hint{display:none}
+  .panel{scroll-margin-bottom:48vh}
+}
+@media (prefers-reduced-motion:no-preference){
+  .rec,.block,.panel,.sindex td{transition:background-color .15s,border-color .15s,box-shadow .15s}
+}
+</style>
+
+<div class="page">
+  <header class="top">
+    <h1>SSTable Storage Walkthrough</h1>
+    <p class="lede">A key is never inserted into a file on disk. It is inserted into a sorted tree in memory, and that tree is later written out whole as a new sorted file. A read looks in memory first, then works back through the files from newest to oldest. Run an operation and step through what it touches.</p>
+    <p class="scale">In this model the memtable holds 6 records and a block holds 3, so everything fits on screen. Real engines use megabytes and kilobytes. The sample keys are the <code>hand…</code> words from the book's figures.</p>
+  </header>
+
+  <div class="layout">
+    <aside class="side">
+      <section class="stepper" aria-label="Current step" aria-live="polite">
+        <div class="stepper-head">
+          <span class="op-title" id="op-title"></span>
+          <span class="count" id="op-count"></span>
+        </div>
+        <div class="btnrow">
+          <button type="button" class="btn" id="b-back">Back</button>
+          <button type="button" class="btn primary" id="b-next">Next step</button>
+          <button type="button" class="btn" id="b-end">Run to end</button>
+        </div>
+        <p class="step-text" id="step-text"></p>
+        <p class="result" id="result" hidden></p>
+        <p class="keys-hint">Arrow keys also step back and forward.</p>
+      </section>
+
+      <section class="console" aria-label="Operations">
+        <form id="f-write" autocomplete="off">
+          <span class="cap">Write</span>
+          <div class="fields">
+            <div class="field"><label for="w-key">Key</label><input type="text" id="w-key" maxlength="14" value="handrail" spellcheck="false"></div>
+            <div class="field"><label for="w-val">Value</label><input type="text" id="w-val" maxlength="8" value="412" spellcheck="false"></div>
+          </div>
+          <div class="btnrow">
+            <button type="submit" class="btn primary" id="b-put">Put</button>
+            <button type="button" class="btn" id="b-del">Delete key</button>
+            <button type="button" class="btn" id="b-rand">Put random key</button>
+          </div>
+        </form>
+        <hr class="sep">
+        <form id="f-read" autocomplete="off">
+          <span class="cap">Read</span>
+          <div class="field"><label for="r-key">Key</label><input type="text" id="r-key" maxlength="14" value="handlebars" spellcheck="false"></div>
+          <div class="btnrow"><button type="submit" class="btn primary" id="b-get">Get</button></div>
+        </form>
+        <div class="tries">
+          <span class="cap">Reads to try <small>on the sample data</small></span>
+          <div class="chips" id="chips"></div>
+        </div>
+        <hr class="sep">
+        <div class="btnrow">
+          <button type="button" class="btn" id="b-flush">Flush memtable</button>
+          <button type="button" class="btn" id="b-compact">Compact segments</button>
+          <button type="button" class="btn" id="b-reset">Reset sample</button>
+        </div>
+        <label class="check" for="c-step"><input type="checkbox" id="c-step" checked> Step through each operation</label>
+        <p class="err" id="err" role="alert" hidden></p>
+      </section>
+
+      <section class="trace" aria-label="Steps so far">
+        <span class="cap">Steps so far</span>
+        <ol id="trace"></ol>
+      </section>
+    </aside>
+
+    <main class="store" id="store"></main>
+  </div>
+
+  <section class="notes">
+    <div>
+      <h2>How does a new key land in the right place?</h2>
+      <p>It doesn't go into a file at all. A put appends one line to the log and inserts the key into the memtable. The memtable is the only sorted structure that accepts inserts, and it lives in RAM, where putting a key into a balanced tree is cheap.</p>
+      <p>When the memtable fills up, it is walked in key order and written out front to back. The file is sorted because the tree was. Existing segments are never opened for writing.</p>
+    </div>
+    <div>
+      <h2>Where does a read look for it?</h2>
+      <p>Memtable first, then each segment from newest to oldest. The first place that has the key answers the read, whether it holds a value or a tombstone.</p>
+      <p>That order is what makes overwrites and deletes work without editing old files. The stale value is still on disk. The read just never gets that far.</p>
+    </div>
+    <div>
+      <h2>What does the sparse index buy?</h2>
+      <p>It stores one key per block instead of one per record. Since the file is sorted, knowing where <code>handbag</code> and <code>handiwork</code> start is enough to know <code>handful</code> must sit between them.</p>
+      <p>So the index stays small enough for RAM even when the file is huge. The price is a short scan inside one block, which is read from disk in one go anyway.</p>
+    </div>
+    <div>
+      <h2>What this model leaves out</h2>
+      <ul>
+        <li>Bloom filters. Each segment keeps one so a read for a missing key can skip the file without a disk read.</li>
+        <li>Background work. Flushes and compaction run on other threads while new writes go to a fresh memtable.</li>
+        <li>Compaction strategy. Real engines merge a few files at a time, by size tier or by level. A tombstone can only be dropped once no older file could still hold the key.</li>
+        <li>Blocks are compressed, and each file also records its smallest and largest key.</li>
+      </ul>
+    </div>
+    <div class="wide">
+      <h2>The read path as Go</h2>
+      <p>This is the loop the stepper walks through, with the same early exits.</p>
+      <div class="codewrap"><pre><code>func (db *DB) Get(key string) (string, bool) {
+    if e, ok := db.memtable.Get(key); ok {
+        return e.Value, !e.Tombstone        <span class="c">// newest write wins</span>
+    }
+    for _, seg := range db.segments {       <span class="c">// ordered newest first</span>
+        off, ok := seg.index.Floor(key)     <span class="c">// last index key &lt;= key</span>
+        if !ok {
+            continue                        <span class="c">// key sorts before the whole file</span>
+        }
+        for _, e := range seg.ReadBlock(off) {
+            if e.Key == key {
+                return e.Value, !e.Tombstone
+            }
+            if e.Key &gt; key {
+                break                       <span class="c">// sorted: it can't be further on</span>
+            }
+        }
+    }
+    return "", false
+}</code></pre></div>
+    </div>
+  </section>
+</div>
+
+<script>
+(function(){
+"use strict";
+const MEM_LIMIT = 6, BLOCK = 3;
+const KEY_RE = /^[a-z0-9_-]{1,14}$/, VAL_RE = /^[A-Za-z0-9_.-]{1,8}$/;
+const RANDOM_WORDS = ["handball","handbook","handcart","handcraft","handheld","handhold","handmade","handout","handpick","handrail","handset","handspring","handstand","handwork","handwoven","handwritten","handclap","handbill","handloom","handsaw"];
+const TRIES = [["handy","just written"],["handoff","flushed to disk"],["handlebars","only in the oldest file"],["handful","overwritten"],["handcuffs","deleted"],["handmade","never written"]];
+const REC_TAGS = {new:"written",flush:"to disk",hit:"match",tomb:"deleted",lt:"before key",gt:"past key",head:"cursor",pick:"copy",drop:"drop"};
+
+const $ = id => document.getElementById(id);
+const esc = s => String(s).replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const K = k => "<code>" + esc(k) + "</code>";
+const clone = o => JSON.parse(JSON.stringify(o));
+const last = a => a[a.length - 1];
+const segName = id => "segment-" + id;
+const plural = (n, w) => n + " " + w + (n === 1 ? "" : "s");
+
+/* ---------- storage model ---------- */
+function recSize(r){ return r.k.length + (r.tomb ? 0 : r.v.length) + 2; }
+function buildSegment(id, recs){
+  let off = 0; const out = [], index = [];
+  recs.forEach((r, i) => {
+    if (i % BLOCK === 0) index.push({k: r.k, off: off, block: i / BLOCK});
+    out.push({k: r.k, v: r.v, tomb: !!r.tomb, off: off});
+    off += recSize(r);
+  });
+  return {id: id, recs: out, index: index, bytes: off};
+}
+function emptyState(){ return {mem: [], wal: [], segs: [], building: null, nextId: 1}; }
+
+/* ---------- step generators: each returns [{label, html, state, hl, result}] ---------- */
+function flushSteps(s, steps, manual){
+  const n = s.mem.length, id = s.nextId++, name = segName(id);
+  const seg = buildSegment(id, s.mem);
+  s.segs.unshift(Object.assign(clone(seg), {index: [], writing: true}));
+  steps.push({label: (manual ? "Write " : "Memtable full: write ") + name, state: clone(s),
+    hl: {memFlush: true, focus: "seg-" + id, segs: {}},
+    html: (manual ? "Flush requested. The memtable's " + plural(n, "record") + " are " : "The memtable holds " + n + " records, which is its limit here. It is ")
+      + "written to disk as <code>" + name + ".sst</code>. The tree is walked in key order, so the file comes out sorted in one sequential write. Nothing on disk gets sorted or rearranged."});
+  s.segs[0] = clone(seg);
+  const hs = {}; hs[id] = {idxAll: true};
+  steps.push({label: "Build the sparse index", state: clone(s), hl: {memFlush: true, focus: "seg-" + id, segs: hs},
+    html: "While the file is written, the first key of each block and its byte offset are noted. That list is the sparse index: " + plural(seg.index.length, "entry").replace("entrys","entries") + " for " + plural(n, "record") + ". It is small enough to keep in RAM."});
+  s.mem = []; s.wal = [];
+  steps.push({label: "Clear memtable and log", state: clone(s), hl: {focus: "seg-" + id, segs: {}},
+    html: "The data is safe in " + name + ", so the memtable is emptied and the log is discarded. " + name + " is now the newest file and will never be modified. Reads check it right after the memtable.",
+    result: {kind: "found", text: name + ".sst written, " + plural(n, "record") + ", " + seg.bytes + " bytes"}});
+}
+
+function genWrite(base, k, v, tomb){
+  const steps = [], s = clone(base), rec = {k: k, v: tomb ? "" : v, tomb: !!tomb};
+  s.wal.push(rec);
+  steps.push({label: "Append to the log", state: clone(s), hl: {wal: s.wal.length - 1, focus: "wal", segs: {}},
+    html: "<code>" + (tomb ? "DEL " + esc(k) : "PUT " + esc(k) + "=" + esc(v)) + "</code> is appended to the write-ahead log on disk. This is the only disk write the operation makes right now. It is a plain append, so it is fast, and it lets the memtable be rebuilt if the process crashes."});
+  let pos = s.mem.findIndex(r => r.k >= k);
+  if (pos < 0) pos = s.mem.length;
+  const exists = pos < s.mem.length && s.mem[pos].k === k;
+  const prev = s.mem[pos - 1], next = exists ? s.mem[pos + 1] : s.mem[pos];
+  if (exists) s.mem[pos] = rec; else s.mem.splice(pos, 0, rec);
+  const where = prev && next ? "between " + K(prev.k) + " and " + K(next.k)
+    : prev ? "after " + K(prev.k) + ", at the end"
+    : next ? "before " + K(next.k) + ", at the front" : "as its first record";
+  let html;
+  if (exists) html = K(k) + " is already in the memtable, so its entry is replaced in place" + (tomb ? " with a tombstone" : "") + ". RAM is mutable. The files on disk are not, and none of them was touched.";
+  else if (tomb) html = "A tombstone for " + K(k) + " goes into the memtable, " + where + ". A delete is just another write. Older segments may still hold a value for this key and they can't be edited, so the tombstone sits in front of them and hides it.";
+  else html = K(k) + " goes into the memtable, " + where + ". The memtable is a sorted tree in RAM (a red-black tree or a skip list), so finding the slot takes O(log n). This is the only place where a key is ever inserted in the right spot. No segment file was touched.";
+  const full = s.mem.length >= MEM_LIMIT;
+  steps.push({label: exists ? "Replace in memtable" : "Insert into memtable", state: clone(s),
+    hl: {mem: {key: k, kind: "new"}, focus: "mem", segs: {}}, html: html,
+    result: full ? null : {kind: "found", text: "write accepted, memtable " + s.mem.length + "/" + MEM_LIMIT}});
+  if (full) flushSteps(s, steps, false);
+  return steps;
+}
+
+function genFlush(base){
+  const s = clone(base);
+  if (!s.mem.length) return [{label: "Nothing to flush", state: s, hl: {focus: "mem", segs: {}},
+    html: "The memtable is empty, so there is nothing to write out.", result: {kind: "none", text: "no segment written"}}];
+  const steps = []; flushSteps(s, steps, true); return steps;
+}
+
+function genGet(base, k){
+  const steps = [], s = clone(base), hl = {segs: {}};
+  const push = (label, html, result) => steps.push({label: label, html: html, state: s, hl: clone(hl), result: result || null});
+  const lead = "The read starts in the memtable, because that is where the newest writes live. ";
+  const m = s.mem.find(r => r.k === k);
+  hl.focus = "mem";
+  if (m){
+    hl.mem = {key: k, kind: m.tomb ? "tomb" : "hit"};
+    if (m.tomb) push("Memtable: tombstone", lead + "It holds a tombstone for " + K(k) + ". The key was deleted, so the read reports it as missing and stops, even if an older segment still has a value.", {kind: "none", text: "GET " + k + " → not found (deleted)"});
+    else push("Memtable: found", lead + K(k) + " is there with value " + K(m.v) + ". The read returns it and stops. Any older copy on disk is never looked at.", {kind: "found", text: "GET " + k + " → " + m.v});
+    return steps;
+  }
+  hl.memMiss = true;
+  if (!s.segs.length){
+    push("Memtable: not there", lead + K(k) + " is not in it, and there are no segments on disk to check.", {kind: "none", text: "GET " + k + " → not found"});
+    return steps;
+  }
+  push("Memtable: not there", lead + K(k) + " is not in it. Next stop is the disk, one segment at a time, newest first.");
+  for (let si = 0; si < s.segs.length; si++){
+    const seg = s.segs[si], name = segName(seg.id), isLast = si === s.segs.length - 1;
+    const onward = isLast ? "" : " On to the next older segment.";
+    hl.focus = "seg-" + seg.id;
+    let ii = -1;
+    seg.index.forEach((e, i) => { if (e.k <= k) ii = i; });
+    if (ii < 0){
+      hl.segs[seg.id] = {verdict: "skip"};
+      push(name + ": ruled out by index", name + ": its sparse index starts at " + K(seg.index[0].k) + ", which already sorts after " + K(k) + ". The whole file is sorted, so the key can't be in it. No disk read needed." + onward);
+      continue;
+    }
+    const e = seg.index[ii], nextE = seg.index[ii + 1];
+    const h = hl.segs[seg.id] = {idx: ii, block: e.block, recs: {}};
+    push(name + ": index → offset " + e.off, name + ": check its sparse index, which is held in RAM. "
+      + (nextE ? K(e.k) + " ≤ " + K(k) + " &lt; " + K(nextE.k) + ", so if the key is in this file it sits in the block that starts at byte offset " + e.off + "."
+               : K(e.k) + " is the last index entry and it sorts at or before " + K(k) + ", so the key can only be in the final block, at byte offset " + e.off + ".")
+      + " One seek, one block read.");
+    const start = e.block * BLOCK, end = Math.min(start + BLOCK, seg.recs.length);
+    for (let ri = start; ri < end; ri++){
+      const r = seg.recs[ri];
+      if (r.k === k){
+        h.recs[ri] = r.tomb ? "tomb" : "hit"; h.verdict = r.tomb ? "tomb" : "hit";
+        if (r.tomb) push("Tombstone in " + name, "Offset " + r.off + " holds " + K(k) + " as a tombstone. The key was deleted after any older value was written, so the read reports it as missing and stops here." + (isLast ? "" : " The older value further down is never read."), {kind: "none", text: "GET " + k + " → not found (deleted)"});
+        else push("Found in " + name, "Offset " + r.off + " holds " + K(k) + ". Its value " + K(r.v) + " is returned and the read stops." + (isLast ? "" : " Older segments are not consulted, so an earlier value for this key would never be seen."), {kind: "found", text: "GET " + k + " → " + r.v});
+        return steps;
+      }
+      if (r.k > k){
+        h.recs[ri] = "gt"; h.verdict = "miss";
+        push(esc(r.k) + " sorts after: stop", "Offset " + r.off + " holds " + K(r.k) + ", which sorts after " + K(k) + ". The file is sorted, so the key can't appear further on. " + name + " does not have it." + onward);
+        break;
+      }
+      h.recs[ri] = "lt";
+      if (ri === end - 1){
+        h.verdict = "miss";
+        push("End of block: not in " + name, "Offset " + r.off + " holds " + K(r.k) + ", which sorts before " + K(k) + ", and that was the last record of the block. "
+          + (nextE ? "The next block starts at " + K(nextE.k) + ", which sorts after the key." : "The file ends here.") + " " + name + " does not have it." + onward);
+      } else {
+        push(esc(r.k) + " sorts before: keep going", (ri === start ? "Scan the block from its start. " : "") + "Offset " + r.off + " holds " + K(r.k) + ", which sorts before " + K(k) + ". Keep scanning.");
+      }
+    }
+  }
+  hl.focus = null;
+  push("Not found", "The memtable and " + (s.segs.length === 1 ? "the only segment" : "all " + s.segs.length + " segments") + " have been checked. " + K(k) + " does not exist. This is the expensive read: a missing key can cost a block read in every segment. Real engines keep a Bloom filter per segment to rule most files out without touching the disk.", {kind: "none", text: "GET " + k + " → not found"});
+  return steps;
+}
+
+function genCompact(base){
+  const s = clone(base);
+  if (s.segs.length < 2) return [{label: "Nothing to compact", state: s, hl: {segs: {}},
+    html: "Compaction needs at least two segments to merge. Fill the memtable a couple of times first.", result: {kind: "none", text: "no change"}}];
+  const steps = [], id = s.nextId++, name = segName(id), cur = s.segs.map(() => 0);
+  const inCount = s.segs.reduce((n, g) => n + g.recs.length, 0), inFiles = s.segs.length;
+  s.building = {id: id, recs: []};
+  const mkHl = () => {
+    const hl = {segs: {}, focus: "build"};
+    s.segs.forEach((seg, si) => {
+      const recs = {};
+      for (let i = 0; i < cur[si]; i++) recs[i] = "done";
+      if (cur[si] < seg.recs.length) recs[cur[si]] = "head";
+      hl.segs[seg.id] = {recs: recs};
+    });
+    return hl;
+  };
+  steps.push({label: "Open every segment", state: clone(s), hl: mkHl(),
+    html: "Compaction merges the segment files into one, like the merge step of mergesort. Each file gets a cursor on its first record. The smallest key under any cursor is copied to the output file, then that cursor moves on."});
+  for (;;){
+    const heads = s.segs.map((seg, si) => cur[si] < seg.recs.length ? seg.recs[cur[si]] : null);
+    const live = heads.filter(Boolean);
+    if (!live.length) break;
+    const min = live.reduce((a, r) => r.k < a ? r.k : a, live[0].k);
+    const owners = [];
+    heads.forEach((r, si) => { if (r && r.k === min) owners.push(si); });
+    const win = owners[0], w = heads[win], hl = mkHl();
+    owners.forEach(si => { hl.segs[s.segs[si].id].recs[cur[si]] = (si === win && !w.tomb) ? "pick" : "drop"; });
+    const winName = segName(s.segs[win].id);
+    const others = owners.slice(1).map(si => segName(s.segs[si].id)).join(" and ");
+    let label, html;
+    if (w.tomb){
+      label = esc(min) + ": drop tombstone";
+      html = "The newest entry for " + K(min) + " is a tombstone (" + winName + "). Every segment is part of this merge, so no older value can survive anywhere else. The key is dropped completely" + (others ? ", along with the older value in " + others : "") + ".";
+    } else if (owners.length > 1){
+      label = esc(min) + ": keep the newest";
+      html = K(min) + " is under the cursor in " + winName + " and " + others + ". The value from " + winName + " is kept because that file is newer. The older one is dropped, and " + (owners.length === 2 ? "both" : "all") + " cursors advance.";
+      s.building.recs.push({k: w.k, v: w.v, tomb: false}); hl.buildNew = true;
+    } else {
+      label = "Copy " + esc(min);
+      html = "The smallest key under the cursors is " + K(min) + " (" + winName + "). It is copied to the output and that cursor advances.";
+      s.building.recs.push({k: w.k, v: w.v, tomb: false}); hl.buildNew = true;
+    }
+    steps.push({label: label, html: html, state: clone(s), hl: hl});
+    owners.forEach(si => cur[si]++);
+  }
+  const out = s.building.recs.length, seg = buildSegment(id, s.building.recs);
+  s.segs = out ? [seg] : []; s.building = null;
+  const hs = {}; hs[id] = {idxAll: true};
+  steps.push({label: "Swap in " + name, state: clone(s), hl: {segs: hs, focus: "seg-" + id},
+    html: "The output gets its sparse index and becomes " + name + ". The old files are deleted. " + plural(inCount, "record") + " went in and " + out + " came out. A read now has one file to check instead of " + inFiles + ". The memtable was not involved and still wins over anything on disk.",
+    result: {kind: "found", text: inFiles + " segments → 1, " + inCount + " records → " + out}});
+  return steps;
+}
+
+/* ---------- rendering ---------- */
+function recRow(r, kind){
+  const tag = REC_TAGS[kind];
+  return '<li class="rec' + (kind ? " is-" + kind : "") + '"><span class="rk">' + esc(r.k) + '</span><span class="rv' + (r.tomb ? " tomb" : "") + '">' + (r.tomb ? "tombstone" : esc(r.v)) + '</span><span class="rt">' + (tag || "") + "</span></li>";
+}
+function segHtml(seg, si, total, h, focused){
+  h = h || {};
+  const pos = total === 1 ? "only segment" : si === 0 ? "newest" : si === total - 1 ? "oldest" : "";
+  const verdict = {miss: "not in this file", skip: "ruled out by index", hit: "found here", tomb: "deleted here"}[h.verdict];
+  const recKinds = h.recs || {};
+  let blocks = "";
+  for (let b = 0; b * BLOCK < seg.recs.length; b++){
+    const rows = seg.recs.slice(b * BLOCK, b * BLOCK + BLOCK).map((r, j) => recRow(r, recKinds[b * BLOCK + j])).join("");
+    blocks += '<div class="block' + (h.block === b && !h.verdict ? " is-active" : "") + '"><span class="boff">block ' + b + " · byte offset " + seg.recs[b * BLOCK].off + '</span><ul class="recs">' + rows + "</ul></div>";
+  }
+  const idx = seg.writing ? '<p class="empty">Being built while the file is written.</p>'
+    : "<table><tbody>" + seg.index.map((e, i) => '<tr class="' + (h.idx === i ? "is-active" : h.idxAll ? "is-all" : "") + '"><td>' + esc(e.k) + '</td><td class="off">→ ' + e.off + "</td></tr>").join("") + "</tbody></table>";
+  return '<article class="panel seg' + (focused ? " is-focus" : "") + '"' + (focused ? ' data-focus="1"' : "") + '>'
+    + '<header class="panel-head"><span class="fname">' + segName(seg.id) + ".sst</span>"
+    + (pos ? '<span class="tag">' + pos + "</span>" : "")
+    + '<span class="meta">' + plural(seg.recs.length, "record") + " · " + seg.bytes + " bytes · immutable</span>"
+    + (verdict ? '<span class="tag t-' + h.verdict + '">' + verdict + "</span>" : "") + "</header>"
+    + '<div class="seg-body"><div class="sindex"><span class="cap">Sparse index <small>· kept in RAM</small></span>' + idx + "</div>"
+    + '<div class="datafile"><span class="cap">Data file <small>· sorted by key</small></span><div class="blocks">' + blocks + "</div></div></div></article>";
+}
+function renderStore(step){
+  const s = step.state, hl = step.hl || {}, hs = hl.segs || {};
+  const f = name => hl.focus === name;
+  const fa = name => f(name) ? ' data-focus="1"' : "";
+  const memRows = s.mem.length
+    ? s.mem.map(r => recRow(r, hl.mem && hl.mem.key === r.k ? hl.mem.kind : hl.memFlush ? "flush" : "")).join("")
+    : '<li class="empty">Empty. The next write lands here.</li>';
+  let meter = "";
+  for (let i = 0; i < MEM_LIMIT; i++) meter += "<i" + (i < s.mem.length ? ' class="on"' : "") + "></i>";
+  const left = MEM_LIMIT - s.mem.length;
+  const ramNote = hl.memFlush ? "The memtable is being written out. A real engine keeps serving reads from it until the file is complete."
+    : left > 0 ? plural(left, "more new key") + " until the memtable is full and gets flushed to disk as a segment."
+    : "Full.";
+  const walRows = s.wal.length
+    ? s.wal.map((r, i) => '<li class="walrec' + (hl.wal === i ? " is-new" : "") + '">' + (r.tomb ? "DEL " + esc(r.k) : "PUT " + esc(r.k) + "=" + esc(r.v)) + "</li>").join("")
+    : '<li class="empty">Empty. Nothing in the memtable needs recovering.</li>';
+  let segs = "";
+  if (s.building){
+    const b = s.building;
+    segs += '<article class="panel seg building' + (f("build") ? " is-focus" : "") + '"' + fa("build") + '><header class="panel-head"><span class="fname">' + segName(b.id) + '.sst</span><span class="tag t-new">being written</span><span class="meta">' + plural(b.recs.length, "record") + ' so far</span></header><ul class="recs">'
+      + (b.recs.length ? b.recs.map((r, i) => recRow(r, hl.buildNew && i === b.recs.length - 1 ? "new" : "")).join("") : '<li class="empty">Merged records are appended here in key order.</li>') + "</ul></article>";
+  }
+  segs += s.segs.length
+    ? s.segs.map((seg, si) => segHtml(seg, si, s.segs.length, hs[seg.id], f("seg-" + seg.id))).join("")
+    : (s.building ? "" : '<p class="empty">No segments yet. They appear when the memtable is flushed.</p>');
+  $("store").innerHTML =
+    '<section class="zone ram"><header class="zone-head"><h2>RAM</h2><p>Mutable and sorted. Lost if the process crashes.</p></header>'
+    + '<div class="ramrow"><div class="panel' + (f("mem") ? " is-focus" : "") + '"' + fa("mem") + '><header class="panel-head"><span class="fname">memtable</span><span class="meter" aria-hidden="true">' + meter + '</span><span class="meta">' + s.mem.length + " of " + MEM_LIMIT + " records</span>"
+    + (hl.memMiss ? '<span class="tag t-miss">not here</span>' : "") + '</header><ul class="recs">' + memRows + "</ul></div>"
+    + '<p class="ramnote">' + ramNote + "</p></div></section>"
+    + '<section class="zone disk"><header class="zone-head"><h2>Disk</h2><p>Files are only appended to or written once. Never edited.</p></header>'
+    + '<div class="panel' + (f("wal") ? " is-focus" : "") + '"' + fa("wal") + '><header class="panel-head"><span class="fname">write-ahead log</span><span class="meta">arrival order, covers the current memtable only</span></header><ul class="wal">' + walRows + "</ul></div>"
+    + '<p class="readorder">Segments. A read checks them top to bottom, newest first.</p>' + segs + "</section>";
+}
+
+/* ---------- controller ---------- */
+let base = null, op = null;
+function show(scroll){
+  const st = op.steps[op.i], n = op.steps.length;
+  renderStore(st);
+  $("op-title").textContent = op.title;
+  $("op-count").textContent = "Step " + (op.i + 1) + " of " + n;
+  $("step-text").innerHTML = st.html;
+  const res = $("result");
+  if (st.result){ res.hidden = false; res.textContent = st.result.text; res.className = "result r-" + st.result.kind; }
+  else res.hidden = true;
+  $("b-back").disabled = op.i === 0;
+  $("b-next").disabled = $("b-end").disabled = op.i === n - 1;
+  $("trace").innerHTML = op.steps.slice(0, op.max + 1).map((s, i) => '<li class="' + (i === op.i ? "cur" : "") + '"><button type="button" data-i="' + i + '">' + s.label + "</button></li>").join("");
+  if (scroll){
+    const el = document.querySelector('#store [data-focus="1"]');
+    const calm = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    if (el && el.scrollIntoView) el.scrollIntoView({block: "nearest", behavior: calm ? "auto" : "smooth"});
+  }
+}
+function go(i, scroll){
+  op.i = Math.max(0, Math.min(op.steps.length - 1, i));
+  op.max = Math.max(op.max, op.i);
+  show(scroll !== false);
+}
+function start(title, gen, scroll){
+  if (op) base = clone(last(op.steps).state);
+  const steps = gen(base);
+  op = {title: title, steps: steps, i: 0, max: 0};
+  go($("c-step").checked ? 0 : steps.length - 1, scroll);
+}
+function fail(msg){ const e = $("err"); e.textContent = msg; e.hidden = !msg; return !msg; }
+function readKey(id){
+  const k = $(id).value.trim().toLowerCase();
+  if (!KEY_RE.test(k)){ fail("A key is 1 to 14 characters: a–z, 0–9, - or _."); $(id).focus(); return null; }
+  fail(""); return k;
+}
+function sample(){
+  let s = emptyState();
+  const w = (k, v) => { s = last(genWrite(s, k, v, false)).state; };
+  const d = k => { s = last(genWrite(s, k, "", true)).state; };
+  w("handiwork","5741"); w("handbag","8786"); w("handsome","2729"); w("handful","40308"); w("handcuffs","2752"); w("handlebars","3869");
+  w("handoff","2110"); w("handicap","65995"); w("handful","44662"); w("handkerchief","16324"); w("handprinted","11150"); d("handcuffs");
+  w("handy","7103"); w("handsome","3001"); w("handshake","920");
+  return s;
+}
+
+$("f-write").addEventListener("submit", ev => {
+  ev.preventDefault();
+  const k = readKey("w-key"); if (k === null) return;
+  const v = $("w-val").value.trim();
+  if (!VAL_RE.test(v)){ fail("A value is 1 to 8 characters: letters, digits, . - or _."); $("w-val").focus(); return; }
+  start("PUT " + k + "=" + v, s => genWrite(s, k, v, false));
+});
+$("b-del").addEventListener("click", () => {
+  const k = readKey("w-key"); if (k === null) return;
+  start("DELETE " + k, s => genWrite(s, k, "", true));
+});
+$("b-rand").addEventListener("click", () => {
+  fail("");
+  const k = RANDOM_WORDS[Math.floor(Math.random() * RANDOM_WORDS.length)], v = String(100 + Math.floor(Math.random() * 9900));
+  $("w-key").value = k; $("w-val").value = v;
+  start("PUT " + k + "=" + v, s => genWrite(s, k, v, false));
+});
+$("f-read").addEventListener("submit", ev => {
+  ev.preventDefault();
+  const k = readKey("r-key"); if (k === null) return;
+  start("GET " + k, s => genGet(s, k));
+});
+$("chips").innerHTML = TRIES.map(t => '<button type="button" class="chip" data-k="' + t[0] + '"><b>' + t[0] + "</b> <span>" + t[1] + "</span></button>").join("");
+$("chips").addEventListener("click", ev => {
+  const b = ev.target.closest("button[data-k]"); if (!b) return;
+  fail(""); $("r-key").value = b.dataset.k;
+  start("GET " + b.dataset.k, s => genGet(s, b.dataset.k));
+});
+$("b-flush").addEventListener("click", () => { fail(""); start("FLUSH memtable", genFlush); });
+$("b-compact").addEventListener("click", () => { fail(""); start("COMPACT segments", genCompact); });
+$("b-reset").addEventListener("click", () => { fail(""); boot(true); });
+$("b-next").addEventListener("click", () => go(op.i + 1));
+$("b-back").addEventListener("click", () => go(op.i - 1));
+$("b-end").addEventListener("click", () => go(op.steps.length - 1));
+$("trace").addEventListener("click", ev => {
+  const b = ev.target.closest("button[data-i]"); if (b) go(+b.dataset.i);
+});
+document.addEventListener("keydown", ev => {
+  if (ev.target.closest("input") || ev.metaKey || ev.ctrlKey || ev.altKey) return;
+  if (ev.key === "ArrowRight"){ ev.preventDefault(); go(op.i + 1); }
+  else if (ev.key === "ArrowLeft"){ ev.preventDefault(); go(op.i - 1); }
+});
+
+function boot(scroll){
+  base = sample(); op = null;
+  const steps = genGet(base, "handlebars");
+  op = {title: "GET handlebars", steps: steps, i: 0, max: 0};
+  $("r-key").value = "handlebars";
+  go(0, scroll);
+}
+boot(false);
+})();
+</script>
+
+</body></html>
