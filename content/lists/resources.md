@@ -45,4 +45,5 @@ summary: A collection of resources, tutorials, and tools that I find useful or i
 ## Awesome lists
 
 - Docker and Kubernetes: [Educational resources](https://docs.docker.com/guides/resources/)
-
+- [The Book of Secret Knowledge](https://github.com/trimstray/the-book-of-secret-knowledge): A collection of inspiring lists, manuals, cheatsheets, blogs, hacks, one-liners, cli/web tools, and more.
+- [Awesome Quantified Self](https://github.com/woop/awesome-quantified-self)
