@@ -62,12 +62,15 @@ These are books I have read or plan to read, along with some audio books.
 - [Unsupervised learning book list](https://danielmiessler.com/podcast/unsupervised-learning-book-list/)
 - [Good reads best books award](https://www.goodreads.com/choiceawards/best-books-2022)
 - [Jordan Peterson | Great Books](https://www.jordanbpeterson.com/great-books/)
-- [Financial Tortoise](https://www.financialtortoise.com/bestbooks)
+
 - [Guardian best of 21st century](https://www.theguardian.com/books/2019/sep/21/best-books-of-the-21st-century)
 - [Financial Tortoise](https://www.financialtortoise.com/bestbooks)
 - [Guardian best of 21st century](https://www.theguardian.com/books/2019/sep/21/best-books-of-the-21st-century)
 - [Brandur's list](https://brandur.org/reading)
 - [Newbery Medal Winners](https://en.wikipedia.org/wiki/Newbery_Medal)
+
+- [Gate's notes](https://www.gatesnotes.com/books)
+
 - [Phil Eaton's list](https://notes.eatonphil.com/tags/books.html)
 
 
