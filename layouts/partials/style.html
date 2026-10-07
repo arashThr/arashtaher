@@ -206,8 +206,28 @@
   content ul,
   main.post ul,
   article ul {
-    margin: 0.75rem 0 1rem 1.1rem;
+    --list-indent: 1.25rem;
+    margin: 0.75rem 0 1rem 0;
+    padding-left: var(--list-indent);
     list-style: disc;
+  }
+
+  content li:has(> input[type="checkbox"]),
+  main.post li:has(> input[type="checkbox"]),
+  article li:has(> input[type="checkbox"]) {
+    list-style: none;
+  }
+
+  content li > input[type="checkbox"],
+  main.post li > input[type="checkbox"],
+  article li > input[type="checkbox"] {
+    width: 0.85em;
+    height: 0.85em;
+    margin: 0 calc(var(--list-indent) - 0.85em) 0.12em calc(var(--list-indent) * -1);
+    padding: 0;
+    vertical-align: middle;
+    accent-color: var(--color-text);
+    opacity: 1;
   }
 
   content ol,
@@ -335,7 +355,7 @@
     color: var(--color-muted);
   }
 
-  input,
+  input:not([type="checkbox"]):not([type="radio"]),
   textarea,
   select {
     width: 100%;
