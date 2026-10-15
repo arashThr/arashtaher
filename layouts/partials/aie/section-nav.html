@@ -1,0 +1,20 @@
+{{ $root := site.GetPage "/aie" }}
+{{ $pages := where $root.RegularPages "Params.kind" "in" (slice "til" "essay") }}
+{{ $pages = $pages.ByDate.Reverse }}
+{{ $newer := false }}
+{{ $older := false }}
+{{ with $pages.Prev . }}
+  {{ if .Date.After $.Date }}{{ $newer = . }}{{ else }}{{ $older = . }}{{ end }}
+{{ end }}
+{{ with $pages.Next . }}
+  {{ if .Date.After $.Date }}{{ $newer = . }}{{ else }}{{ $older = . }}{{ end }}
+{{ end }}
+<nav class="aie-neighbors" aria-label="In this series">
+  <div>
+    {{ with $newer }}<a href="{{ .RelPermalink }}">Newer: {{ .Title }}</a>{{ end }}
+  </div>
+  <div>
+    {{ with $older }}<a href="{{ .RelPermalink }}">Older: {{ .Title }}</a>{{ end }}
+  </div>
+</nav>
+<p class="aie-back"><a href="{{ "aie/" | relURL }}">From Go to AI Engineering</a></p>

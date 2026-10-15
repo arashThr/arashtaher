@@ -1,0 +1,15 @@
+{{ with .Params.builds_on }}
+<section class="aie-builds-on">
+  <h2>Built from these notes</h2>
+  <ul>
+    {{ range . }}
+    {{ $slug := . }}
+    {{ with site.GetPage (printf "/aie/%s" $slug) }}
+    <li><a href="{{ .RelPermalink }}">{{ .Title }}</a></li>
+    {{ else }}
+    <li class="muted">{{ $slug }}</li>
+    {{ end }}
+    {{ end }}
+  </ul>
+</section>
+{{ end }}

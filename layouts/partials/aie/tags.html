@@ -1,0 +1,7 @@
+{{ if .Params.tags }}
+<p class="tag-cloud">
+  {{ range (.GetTerms "tags") }}
+  <a href="{{ .RelPermalink }}">#{{ .LinkTitle }}</a>
+  {{ end }}
+</p>
+{{ end }}

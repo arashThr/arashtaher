@@ -12,16 +12,31 @@
   <title>{{- block "title" . }}{{ with .Title }}{{ . }} | {{ end }}{{ .Site.Title }}{{- end }}</title>
 
   <meta name="title" content="{{ with .Title }}{{ . }}{{ else }}{{ .Site.Title }}{{ end }}" />
-  <meta name="description" content="{{ with .Description }}{{ . }}{{ else }}{{if .IsPage}}{{ .Summary }}{{ else }}{{ with .Site.Params.description }}{{ . }}{{ end }}{{ end }}{{ end }}" />
+  {{- $description := "" -}}
+  {{- if .Description -}}
+    {{- $description = .Description -}}
+  {{- else if and .IsPage (eq .Params.kind "essay") -}}
+    {{- $description = .Params.summary | default .Summary -}}
+  {{- else if and .IsPage (eq .Params.kind "til") -}}
+    {{- $description = partial "aie/first-sentence.html" . -}}
+  {{- else if .IsPage -}}
+    {{- $description = .Summary -}}
+  {{- else -}}
+    {{- with site.Params.description }}{{ $description = . }}{{ end -}}
+  {{- end -}}
+  <meta name="description" content="{{ $description }}" />
   <meta name="author" content="{{ with .Site.Params.author }}{{ . }}{{ else }}{{ .Site.Title }}{{ end }}" />
   <meta name="referrer" content="no-referrer-when-downgrade" />
 
   {{ template "_internal/opengraph.html" . }}
   {{ template "_internal/twitter_cards.html" . }}
 
-  {{ with .OutputFormats.Get "rss" -}}
-  {{ printf `<link rel="%s" type="%s" href="%s" title="%s" />` .Rel .MediaType.Type .Permalink $.Site.Title | safeHTML }}
-  {{ end -}}
+  {{- $rss := .OutputFormats.Get "rss" -}}
+  {{- if $rss -}}
+  {{ printf `<link rel="%s" type="%s" href="%s" title="%s" />` $rss.Rel $rss.MediaType.Type $rss.Permalink site.Title | safeHTML }}
+  {{- else if and (eq .Section "aie") .IsPage -}}
+  {{ printf `<link rel="alternate" type="application/rss+xml" href="%s" title="%s" />` ("aie/index.xml" | absURL) site.Title | safeHTML }}
+  {{- end -}}
 
   {{- partial "style.html" . -}}
   {{- partial "custom_head.html" . -}}
@@ -31,7 +46,7 @@
   <header>
     {{- partial "header.html" . -}}
   </header>
-  <main class="{{ if eq .Type "blog" }}post{{ end }}">
+  <main class="{{ if or (eq .Type "blog") (and (eq .Section "aie") .IsPage) }}post{{ end }}">
     {{- block "main" . }}{{- end }}
   </main>
   <footer>

@@ -443,6 +443,94 @@
     }
   }
 
+  .aie-filters {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 0.35rem 0.25rem;
+    margin: 0.25rem 0 1.5rem;
+  }
+
+  .aie-filters a,
+  .aie-filters .sep {
+    color: var(--color-muted);
+  }
+
+  .aie-filters a[aria-current="page"] {
+    color: var(--color-text);
+    font-weight: 700;
+    text-decoration: none;
+  }
+
+  .aie-stream {
+    display: flex;
+    flex-direction: column;
+    gap: 1.75rem;
+  }
+
+  .aie-entry h2 {
+    text-transform: none;
+    letter-spacing: 0;
+    font-size: 1.15rem;
+    margin: 0 0 0.35rem;
+  }
+
+  .aie-label {
+    display: inline-block;
+    margin: 0 0 0.35rem;
+    font-size: 0.75rem;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    color: var(--color-muted);
+  }
+
+  .aie-essay {
+    padding-bottom: 0.25rem;
+  }
+
+  .aie-til-body {
+    margin-top: 0.75rem;
+  }
+
+  .aie-til-body > :last-child {
+    margin-bottom: 0;
+  }
+
+  .aie-pager,
+  .aie-neighbors {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    gap: 0.75rem 1.25rem;
+    margin-top: 1.75rem;
+  }
+
+  .aie-neighbors a,
+  .aie-pager a {
+    max-width: 100%;
+  }
+
+  .aie-back,
+  .aie-builds-on,
+  .aie-backlinks,
+  .aie-related {
+    margin-top: 1.75rem;
+  }
+
+  .aie-builds-on h2,
+  .aie-backlinks h2,
+  .aie-related h2 {
+    font-size: 0.85rem;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    margin: 0 0 0.75rem;
+  }
+
+  .aie-related .aie-label {
+    margin-right: 0.35rem;
+  }
+
   @media (max-width: 480px) {
     body {
       padding: 1.5rem 1rem;
@@ -450,6 +538,15 @@
 
     ul {
       margin-left: 0;
+    }
+
+    .aie-entry .post-date {
+      display: block;
+    }
+
+    .aie-pager,
+    .aie-neighbors {
+      flex-direction: column;
     }
   }
 </style>

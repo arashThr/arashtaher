@@ -1,0 +1,25 @@
+{{ define "main" }}
+<content>
+  <h1 class="chrome-title">{{ .Title }}</h1>
+  {{ if .Content }}
+  <div>
+    {{ .Content }}
+  </div>
+  {{ end }}
+  {{ $essays := where (where site.RegularPages "Section" "aie") "Params.kind" "essay" }}
+  {{ $pages := union .RegularPages $essays }}
+  {{ $pages = $pages.ByDate.Reverse }}
+  <ul class="post-list">
+    {{ range $pages }}
+    <li>
+      <a href="{{ .Permalink }}">{{ .Title }}</a>
+      <time datetime='{{ .Date.Format "2006-01-02" }}'>
+        {{ .Date.Format (default "02 Jan, 2006" .Site.Params.dateFormat) }}
+      </time>
+    </li>
+    {{ else }}
+    <li>No posts yet</li>
+    {{ end }}
+  </ul>
+</content>
+{{ end }}

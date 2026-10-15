@@ -1,0 +1,11 @@
+<h1>{{ .Title }}</h1>
+<p class="post-date">
+  <time datetime="{{ .Date.Format "2006-01-02" }}">{{ .Date.Format "02 Jan, 2006" }}</time>
+</p>
+<content>
+  {{ .Content }}
+</content>
+{{ partial "aie/tags.html" . }}
+{{ partial "aie/backlinks.html" . }}
+{{ partial "aie/related.html" . }}
+{{ partial "aie/section-nav.html" . }}

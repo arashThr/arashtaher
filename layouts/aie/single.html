@@ -1,0 +1,11 @@
+{{ define "main" }}
+{{ if in (slice "tils" "essays") .File.ContentBaseName }}
+  {{ errorf "aie/%s.md collides with a filter URL; tils and essays are reserved" .File.ContentBaseName }}
+{{ else if eq .Params.kind "essay" }}
+  {{ partial "aie/essay.html" . }}
+{{ else if eq .Params.kind "til" }}
+  {{ partial "aie/til.html" . }}
+{{ else }}
+  {{ errorf "aie/%s.md needs params.kind \"til\" or \"essay\"" .File.ContentBaseName }}
+{{ end }}
+{{ end }}

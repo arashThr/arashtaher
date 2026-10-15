@@ -1,0 +1,89 @@
+{{ define "main" }}
+<content>
+  {{/* .Params.kind is front matter. .Kind is Hugo's page kind and stays "page". */}}
+  {{ $title := .Title }}
+  {{ if .Params.filter }}
+    {{ $title = .Parent.Title }}
+  {{ end }}
+  <h1 class="chrome-title">{{ $title }}</h1>
+  {{ if and (not .Params.filter) .Content }}
+  <div>
+    {{ .Content }}
+  </div>
+  {{ end }}
+
+  <nav class="aie-filters" aria-label="Filter">
+    <a href="{{ "aie/" | relURL }}"{{ if not .Params.filter }} aria-current="page"{{ end }}>All</a>
+    <span class="sep">·</span>
+    <a href="{{ "aie/tils/" | relURL }}"{{ if eq .Params.filter "til" }} aria-current="page"{{ end }}>TILs</a>
+    <span class="sep">·</span>
+    <a href="{{ "aie/essays/" | relURL }}"{{ if eq .Params.filter "essay" }} aria-current="page"{{ end }}>Essays</a>
+  </nav>
+
+  {{/* Posts live on /aie, not under the tils/essays filter sections.
+       A file named tils.md is not a page when content/aie/tils/ exists, so check the directory too. */}}
+  {{ range os.ReadDir "content/aie" }}
+    {{ if and (not .IsDir) (in (slice "tils.md" "essays.md") .Name) }}
+      {{ errorf "content/aie/%s collides with a filter URL; tils and essays are reserved" .Name }}
+    {{ end }}
+  {{ end }}
+  {{ $root := site.GetPage "/aie" }}
+  {{ range $root.RegularPages }}
+    {{ if in (slice "tils" "essays") .File.ContentBaseName }}
+      {{ errorf "aie/%s.md collides with a filter URL; tils and essays are reserved" .File.ContentBaseName }}
+    {{ end }}
+  {{ end }}
+  {{ $pages := where $root.RegularPages "Params.kind" "in" (slice "til" "essay") }}
+  {{ with .Params.filter }}
+    {{ $pages = where $pages "Params.kind" . }}
+  {{ end }}
+  {{ $pages = $pages.ByDate.Reverse }}
+  {{ $paginator := .Paginate $pages 10 }}
+
+  <div class="aie-stream">
+    {{ range $paginator.Pages }}
+    {{ if eq .Params.kind "essay" }}
+    <article class="aie-entry aie-essay">
+      <p class="aie-label">Essay</p>
+      <h2><a href="{{ .RelPermalink }}">{{ .Title }}</a></h2>
+      <p class="post-date">
+        <time datetime="{{ .Date.Format "2006-01-02" }}">{{ .Date.Format "02 Jan, 2006" }}</time>
+        <span class="sep">·</span>
+        <span>{{ .ReadingTime }} min read</span>
+      </p>
+      {{ with .Params.summary }}<p>{{ . }}</p>{{ end }}
+    </article>
+    {{ else }}
+    <article class="aie-entry aie-til">
+      <h2><a href="{{ .RelPermalink }}">{{ .Title }}</a></h2>
+      <p class="post-date">
+        <time datetime="{{ .Date.Format "2006-01-02" }}">{{ .Date.Format "02 Jan, 2006" }}</time>
+      </p>
+      {{ partial "aie/tags.html" . }}
+      <div class="aie-til-body">
+        {{ .Content }}
+      </div>
+    </article>
+    {{ end }}
+    {{ else }}
+    <p>No notes yet.</p>
+    {{ end }}
+  </div>
+
+  {{ if gt $paginator.TotalPages 1 }}
+  <nav class="aie-pager" aria-label="Pagination">
+    <div>
+      {{ if $paginator.HasPrev }}
+      <a href="{{ $paginator.Prev.URL }}">Newer</a>
+      {{ end }}
+    </div>
+    <p class="muted">Page {{ $paginator.PageNumber }} of {{ $paginator.TotalPages }}</p>
+    <div>
+      {{ if $paginator.HasNext }}
+      <a href="{{ $paginator.Next.URL }}">Older</a>
+      {{ end }}
+    </div>
+  </nav>
+  {{ end }}
+</content>
+{{ end }}

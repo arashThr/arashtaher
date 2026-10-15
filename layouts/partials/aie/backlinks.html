@@ -1,0 +1,17 @@
+{{ $slug := .File.ContentBaseName }}
+{{ $hits := slice }}
+{{ range where (where site.RegularPages "Section" "aie") "Params.kind" "essay" }}
+  {{ if in (.Params.builds_on | default slice) $slug }}
+    {{ $hits = $hits | append . }}
+  {{ end }}
+{{ end }}
+{{ with $hits }}
+<section class="aie-backlinks">
+  <h2>Essays that build on this</h2>
+  <ul>
+    {{ range . }}
+    <li><a href="{{ .RelPermalink }}">{{ .Title }}</a></li>
+    {{ end }}
+  </ul>
+</section>
+{{ end }}

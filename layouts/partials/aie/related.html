@@ -1,0 +1,15 @@
+{{ $related := where (where (site.RegularPages.Related .) "Section" "in" (slice "aie" "blog")) "RelPermalink" "!=" .RelPermalink }}
+{{ $related = first 5 $related }}
+{{ with $related }}
+<section class="aie-related">
+  <h2>Related</h2>
+  <ul>
+    {{ range . }}
+    <li>
+      {{ if eq .Params.kind "essay" }}<span class="aie-label">Essay</span>{{ else if eq .Params.kind "til" }}<span class="aie-label">TIL</span>{{ end }}
+      <a href="{{ .RelPermalink }}">{{ .Title }}</a>
+    </li>
+    {{ end }}
+  </ul>
+</section>
+{{ end }}

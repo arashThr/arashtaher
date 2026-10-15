@@ -1,0 +1,7 @@
+{{- $plain := .Plain | strings.TrimSpace -}}
+{{- $m := findRE `(?s)^.*?[.!?](\s|$)` $plain 1 -}}
+{{- if $m -}}
+{{- index $m 0 | strings.TrimSpace -}}
+{{- else -}}
+{{- $plain -}}
+{{- end -}}

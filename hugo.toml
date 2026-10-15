@@ -10,6 +10,14 @@ enableRobotsTXT = true
 [permalinks]
   blog = "/blog/:slug/"
   tags = "/tags/:slug"
+  aie = "/aie/:contentbasename/"
+
+[related]
+  includeNewer = true
+  threshold = 1
+  [[related.indices]]
+    name = "tags"
+    weight = 100
 
 [params]
   description = "Arash Taher personal website"
@@ -24,13 +32,17 @@ enableRobotsTXT = true
     url = "/blog/"
     weight = 2
   [[menu.main]]
+    name = "AI Engineering"
+    url = "/aie/"
+    weight = 3
+  [[menu.main]]
     name = "Lists"
     url = "/lists/"
-    weight = 3
+    weight = 4
   [[menu.main]]
     name = "CV"
     url = "/cv/"
-    weight = 4
+    weight = 5
 
   # These "images" are used for the structured data templates. This will show up, when
   # services like Twitter or Slack want to generate a preview of a link to your site.
