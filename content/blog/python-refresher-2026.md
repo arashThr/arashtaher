@@ -188,3 +188,36 @@ def my_function(x,y):
 
 - Methods that are decorated with `@staticmethod` receive neither `self` nor `cls` arg.
 - `__repr__` should be unambiguous string representation of an object. Ideally return a string that looks like valid Python code capable of recreating the object
+
+---
+
+Unlike Go, which statically allocates memory for a specific type and fills it with a "zero value", Python variables are just **name tags attached to objects** in memory. Because of this dynamic typing, you can't have a name tag without an object to attach it to.
+
+**Notes**:
+
+- `collections.defaultdict` mimic Go's behavior
+- Dataclasses: Similar to Go Structs
+
+```python
+from dataclasses import dataclass
+
+@dataclass
+class Player:
+    name: str
+    score: int = 0  # Default value 
+    is_active: bool = True
+
+p = Player(name="Marcus")
+print(p.score) # Outputs: 0
+```
+
+Using `dataclass`:
+
+1. Eliminating **init** Boilerplate
+2. Avoid The "Class Attribute" Trap
+3. Free Built-in Methods (`__repr__` and **`eq`**)
+
+```python
+class Team:
+    members = []  # DANGER: Shared across all instances!
+```
