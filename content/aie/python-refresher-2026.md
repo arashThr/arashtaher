@@ -1,10 +1,12 @@
 +++
 title = 'Python Refresher 2026'
 date = '2026-10-15T13:06:57+02:00'
+summary="I haven’t done much programming with Python since version 2.7. Here’s a couple of notable examples and concepts that I’d like to keep as a reminder."
 tags = ["python", "programming", "guide", "summary"]
+[params]
+  kind = "essay"
+builds_on = ["python-repl-cheatsheet"]
 +++
-
-I haven't done much programming with Python since version 2.7. Here's a couple of notable examples and concepts that I'd like to keep as a reminder.
 
 Here are the highlights for me after going through [Learn X in Y minutes](https://learnxinyminutes.com/python/) and [Python Cheatsheet](https://gto76.github.io/python-cheatsheet/):
 

@@ -2,7 +2,7 @@
 title = "TILs for learnings"
 date = "2026-10-11T09:00:00Z"
 draft = true
-tags = ["ai", "tokens"]
+tags = ["ai", "journal", "aie"]
 [params]
   kind = "til"
 +++
