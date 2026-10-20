@@ -39,10 +39,6 @@ enableRobotsTXT = true
     name = "Lists"
     url = "/lists/"
     weight = 4
-  [[menu.main]]
-    name = "CV"
-    url = "/cv/"
-    weight = 5
 
   # These "images" are used for the structured data templates. This will show up, when
   # services like Twitter or Slack want to generate a preview of a link to your site.
