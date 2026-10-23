@@ -65,7 +65,7 @@
     --link-hover-color: var(--color-muted);
     --meta-color: var(--color-muted);
     --font-family: var(--font-text);
-    --bg-color-muted: color-mix(in srgb, var(--color-text) 6%, transparent);
+    --bg-color-muted: color-mix(in srgb, var(--color-text) 6%, var(--color-bg));
   }
 
   *,
@@ -77,7 +77,7 @@
   }
 
   html {
-    font-size: 14px;
+    font-size: 1rem;
     -webkit-text-size-adjust: 100%;
   }
 
@@ -94,7 +94,9 @@
   }
 
   body {
-    background: var(--color-bg);
+    background-color: var(--color-bg);
+    background-image: radial-gradient(color-mix(in srgb, var(--color-text) 20%, transparent) 0.5px, transparent 0.95px);
+    background-size: 15px 15px;
     color: var(--color-text);
     max-width: var(--max-width);
     margin: 0 auto;
@@ -455,7 +457,7 @@
     border-radius: 0;
     background: transparent;
     color: var(--color-text);
-    font-size: 14px;
+    font-size: 1rem;
   }
 
   button,
@@ -469,7 +471,7 @@
     background: var(--color-text);
     color: var(--color-bg);
     cursor: pointer;
-    font-size: 14px;
+    font-size: 1rem;
   }
 
   .appt-button {
