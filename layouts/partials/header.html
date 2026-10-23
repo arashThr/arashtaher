@@ -4,4 +4,38 @@
   <span class="sep">·</span>
   <a href="{{ .URL }}">{{ .Name }}</a>
   {{- end }}
+  <span class="sep">·</span>
+  <button type="button" class="theme-toggle">
+    <span class="to-dark">Dark</span>
+    <span class="to-light">Light</span>
+  </button>
 </nav>
+<script>
+  (function () {
+    var root = document.documentElement;
+    var button = document.querySelector(".theme-toggle");
+    var media = window.matchMedia("(prefers-color-scheme: dark)");
+
+    function effective() {
+      var theme = root.getAttribute("data-theme");
+      if (theme === "light" || theme === "dark") return theme;
+      return media.matches ? "dark" : "light";
+    }
+
+    function label() {
+      var next = effective() === "dark" ? "light" : "dark";
+      button.setAttribute("aria-label", "Switch to " + next + " theme");
+    }
+
+    label();
+    button.addEventListener("click", function () {
+      var next = effective() === "dark" ? "light" : "dark";
+      root.setAttribute("data-theme", next);
+      try { localStorage.setItem("theme", next); } catch (e) {}
+      label();
+    });
+    media.addEventListener("change", function () {
+      if (!root.hasAttribute("data-theme")) label();
+    });
+  })();
+</script>

@@ -35,17 +35,26 @@
     --color-bg: #ffffff;
     --color-text: #000000;
     --color-muted: #666666;
+    color-scheme: light;
     --font-mono: "IBM Plex Mono", "SF Mono", "Cascadia Code", "Fira Code", ui-monospace, monospace;
     --max-width: 640px;
     --nav-width: 9.5rem;
   }
 
   @media (prefers-color-scheme: dark) {
-    :root {
+    :root:not([data-theme="light"]) {
       --color-bg: #000000;
       --color-text: #ffffff;
       --color-muted: #999999;
+      color-scheme: dark;
     }
+  }
+
+  :root[data-theme="dark"] {
+    --color-bg: #000000;
+    --color-text: #ffffff;
+    --color-muted: #999999;
+    color-scheme: dark;
   }
 
   :root {
@@ -180,8 +189,41 @@
     margin-bottom: 2rem;
   }
 
-  header button {
+  .theme-toggle {
+    font: inherit;
+    color: var(--color-muted);
+    background: none;
+    border: 0;
+    padding: 0;
+    cursor: pointer;
+    text-decoration: underline;
+    text-underline-offset: 2px;
+  }
+
+  .theme-toggle:hover {
+    text-decoration: none;
+  }
+
+  .theme-toggle .to-light {
     display: none;
+  }
+
+  :root[data-theme="dark"] .theme-toggle .to-dark {
+    display: none;
+  }
+
+  :root[data-theme="dark"] .theme-toggle .to-light {
+    display: inline;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) .theme-toggle .to-dark {
+      display: none;
+    }
+
+    :root:not([data-theme="light"]) .theme-toggle .to-light {
+      display: inline;
+    }
   }
 
   .header-links,

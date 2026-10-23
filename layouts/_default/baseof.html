@@ -3,6 +3,16 @@
 
 <head>
   <meta charset="utf-8">
+  <script>
+    (function () {
+      try {
+        var theme = localStorage.getItem("theme");
+        if (theme === "light" || theme === "dark") {
+          document.documentElement.setAttribute("data-theme", theme);
+        }
+      } catch (e) {}
+    })();
+  </script>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <link rel="preload" href="{{ "fonts/ibm-plex-mono-400.woff2" | relURL }}" as="font" type="font/woff2" crossorigin>
 
