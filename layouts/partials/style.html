@@ -190,18 +190,25 @@
   }
 
   .theme-toggle {
-    font: inherit;
+    display: inline-flex;
+    align-items: center;
+    align-self: center;
     color: var(--color-muted);
     background: none;
     border: 0;
     padding: 0;
     cursor: pointer;
-    text-decoration: underline;
-    text-underline-offset: 2px;
+    line-height: 0;
   }
 
   .theme-toggle:hover {
-    text-decoration: none;
+    color: var(--color-text);
+  }
+
+  .theme-toggle svg {
+    width: 0.95em;
+    height: 0.95em;
+    display: block;
   }
 
   .theme-toggle .to-light {
@@ -213,7 +220,7 @@
   }
 
   :root[data-theme="dark"] .theme-toggle .to-light {
-    display: inline;
+    display: block;
   }
 
   @media (prefers-color-scheme: dark) {
@@ -222,7 +229,7 @@
     }
 
     :root:not([data-theme="light"]) .theme-toggle .to-light {
-      display: inline;
+      display: block;
     }
   }
 
