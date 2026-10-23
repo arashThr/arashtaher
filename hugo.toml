@@ -42,10 +42,14 @@ enableRobotsTXT = true
   # See https://ogp.me/ and https://gohugo.io/templates/internal#open-graph.
   title = "Arash Taher"
 
-# Disable Hugo's built-in syntax highlighting - using Highlight.js instead
+# Highlight fenced code at build time so pages do not load Highlight.js.
 [markup]
   [markup.highlight]
-    codeFences = false
+    codeFences = true
+    guessSyntax = true
+    lineNos = false
+    noClasses = false
+    style = "github"
   [markup.goldmark]
     [markup.goldmark.renderer]
       unsafe = true

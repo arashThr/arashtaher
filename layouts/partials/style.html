@@ -1,5 +1,35 @@
 <style>
-  @import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:ital,wght@0,400;0,700;1,400;1,700&display=swap');
+  @font-face {
+    font-family: "IBM Plex Mono";
+    font-style: normal;
+    font-weight: 400;
+    font-display: swap;
+    src: url("{{ "fonts/ibm-plex-mono-400.woff2" | relURL }}") format("woff2");
+  }
+
+  @font-face {
+    font-family: "IBM Plex Mono";
+    font-style: italic;
+    font-weight: 400;
+    font-display: swap;
+    src: url("{{ "fonts/ibm-plex-mono-400-italic.woff2" | relURL }}") format("woff2");
+  }
+
+  @font-face {
+    font-family: "IBM Plex Mono";
+    font-style: normal;
+    font-weight: 700;
+    font-display: swap;
+    src: url("{{ "fonts/ibm-plex-mono-700.woff2" | relURL }}") format("woff2");
+  }
+
+  @font-face {
+    font-family: "IBM Plex Mono";
+    font-style: italic;
+    font-weight: 700;
+    font-display: swap;
+    src: url("{{ "fonts/ibm-plex-mono-700-italic.woff2" | relURL }}") format("woff2");
+  }
 
   :root {
     --color-bg: #ffffff;
@@ -269,8 +299,7 @@
   }
 
   code,
-  pre,
-  .hljs {
+  pre {
     font-family: var(--font-mono) !important;
   }
 
@@ -287,8 +316,7 @@
     background: var(--bg-color-muted);
   }
 
-  pre code,
-  pre .hljs {
+  pre code {
     background: transparent !important;
     padding: 0;
     font-size: 0.9em;
