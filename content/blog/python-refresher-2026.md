@@ -188,3 +188,123 @@ def my_function(x,y):
 
 - Methods that are decorated with `@staticmethod` receive neither `self` nor `cls` arg.
 - `__repr__` should be unambiguous string representation of an object. Ideally return a string that looks like valid Python code capable of recreating the object
+
+---
+
+Unlike Go, which statically allocates memory for a specific type and fills it with a "zero value", Python variables are just **name tags attached to objects** in memory. Because of this dynamic typing, you can't have a name tag without an object to attach it to.
+
+**Notes**:
+
+- `collections.defaultdict` mimic Go's behavior
+- Dataclasses: Similar to Go Structs
+
+```python
+from dataclasses import dataclass
+
+@dataclass
+class Player:
+    name: str
+    score: int = 0  # Default value
+    is_active: bool = True
+
+p = Player(name="Marcus")
+print(p.score) # Outputs: 0
+```
+
+Using `dataclass`:
+
+1. Eliminating **init** Boilerplate
+2. Avoid The "Class Attribute" Trap
+3. Free Built-in Methods (`__repr__` and **`eq`**)
+
+```python
+class Team:
+    members = []  # DANGER: Shared across all instances!
+```
+
+## Fast API
+
+### Predefined values
+
+``` python
+from enum import Enum
+
+class ModelName(str, Enum):
+    alexnet = "alexnet"
+    resnet = "resnet"
+    lenet = "lenet"
+
+@app.get("/models/{model_name}")
+async def get_model(model_name: ModelName, q: Annotated[
+        str | None, Query(title="Query string", min_length=3, pattern="^fixedquery$")
+    ] = None): pass
+```
+
+**Unpacking a dict**
+`UserInDB(**user_dict)` would result in something equivalent to:
+
+``` python
+UserInDB(
+    username=user_dict["username"],
+    email=user_dict["email"],
+)
+```
+
+### Exception Handling
+
+`raise HTTPException(status_code=404, detail="Item not found")` or return custom exception:
+
+``` python
+class UnicornException(Exception):
+    def __init__(self, name: str):
+        self.name = name
+
+@app.exception_handler(UnicornException)
+async def unicorn_exception_handler(request: Request, exc: UnicornException):
+    return JSONResponse(
+        status_code=418,
+        content={"message": f"Oops! {exc.name} did something. There goes a rainbow..."},
+    )
+```
+
+### Patching data
+
+``` python
+items = {
+    "foo": {"name": "Foo", "price": 50.2},
+    "bar": {"name": "Bar", "description": "The bartenders", "price": 62, "tax": 20.2},
+}
+
+# use PATCH instead of PUT
+@app.patch("/items/{item_id}")
+async def update_item(item_id: str, item: Item) -> Item:
+    stored_item_data = items[item_id]
+    
+    # Create Item from dict
+    stored_item_model = Item(**stored_item_data)
+    
+    # Generate a dict without default values
+    update_data = item.model_dump(exclude_unset=True)
+    
+    # received partial updates
+    updated_item = stored_item_model.model_copy(update=update_data)
+    
+    # Convert the copied model to something that can be stored in your DB
+    items[item_id] = jsonable_encoder(updated_item)
+    return updated_item
+```
+
+## Dependencies
+
+You can use async def or normal def.
+
+``` python
+async def common_parameters(q: str | None = None, skip: int = 0, limit: int = 100):
+    return {"q": q, "skip": skip, "limit": limit}
+
+CommonsDep = Annotated[dict, Depends(common_parameters)]
+
+@app.get("/items/")
+async def read_items(commons: CommonsDep):
+    return commons
+```
