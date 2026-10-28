@@ -1,5 +1,5 @@
 ---
-title: Just give me a cookbook
+title: Cookbooks and documentations
 date: 2026-10-28T10:19:54.904Z
 tags:
   - infra
