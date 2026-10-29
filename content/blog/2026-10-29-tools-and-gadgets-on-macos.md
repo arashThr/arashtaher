@@ -6,15 +6,14 @@ tags:
   - macos
 ---
 
-Here are some of the less known MacOS apps I'm using that bring huge value to my day to day life.
+Here are some of the lesser known MacOS apps I'm using that bring huge value to my day to day life.
 
-- *Dig Up*: Describe it, dig it up
+- [*Dig Up*](https://github.com/ARahim3/DigUp): Describe it, dig it up. Search your computer by what's in your files
 
   ![image](/images/1793290120736-image.webp)
 
 
-- *PdfCraft*: Great tool for editing PDFs
-- ![image](/images/1793290074488-image.webp)
+- [*PdfCraft*](https://getartcraft.com/apps/pdfcraft): The open-source PDF workbench. Great tool for editing PDFs.![image](/images/1793290074488-image.webp)
 
 
 - *Raycast*: Better altenative for Spotlight
@@ -27,7 +26,7 @@ Here are some of the less known MacOS apps I'm using that bring huge value to my
   ![image](/images/1793290220223-image.webp)
 
 
-- Borumi: The best video recording tool
+- [Borumi](https://borumi.com/): The best video recording tool. I know the creator 😉
 
   ![image](/images/1793290305313-image.webp)
 
