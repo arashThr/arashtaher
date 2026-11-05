@@ -72,3 +72,61 @@ My studies were biased toward European and Swedish market.
 ## Bonds
 
 - [What is a bond? — Vanguard](https://investor.vanguard.com/investor-resources-education/understanding-investment-types/what-is-a-bond)
+
+---
+
+## Terminology and ideas
+
+### Compounding
+
+\- Dividends from stocks inside the fund are reinvested automatically → those dividends then earn more dividends
+
+\- Companies also reinvest their own profits internally, growing stock value over time
+
+\- Example: US market returns \~10%/yr. \~2% is silent dividends, \~8% is price growth
+
+### NAV (Net Asset Value)
+
+\- Price of one fund unit = Total fund assets ÷ Total units outstanding
+
+\- Moves because underlying stock prices move, not independently
+
+\- Calculated once per day for mutual funds; continuously for ETFs
+
+### Accumulating Fund
+
+\- Dividends are reinvested, not paid out as cash
+
+\- You see no dividend events — just NAV slowly rising
+
+\- Tax advantage: no tax until you sell
+
+### Unit Creation/Destruction
+
+\- Buying → fund creates new units, buys more stocks
+
+\- Selling → fund destroys your units, sells stocks
+
+\- New investors don't dilute you — assets and unit count grow proportionally
+
+### S&P 500 Inclusion Effect
+
+\- New company added → all index funds must buy it → price spikes on announcement
+
+\- Already exploited by algorithms within milliseconds of announcement
+
+\- Effect has been shrinking over decades as everyone knows about it
+
+### Why Time Matters
+
+\- Short term: unpredictable
+
+\- Long term: S&P 500 has never had a negative 20-year rolling return
+
+\- 10,000 SEK at 10%/yr → 26k after 10 years, 175k after 30 years
+
+### Biggest Risk for Retail Investors
+
+\- Not volatility
+
+\- Panic-selling during downturns → turns temporary loss into permanent one
