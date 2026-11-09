@@ -6,6 +6,8 @@ tags:
   - documentation
   - engineering
   - software
+description: Most people just need a cookbook, not exhaustive docs. A clear step-by-step path beats architecture essays, especially for infrastructure, with detailed documentation available later for those who want it.
+image: /images/1794182805710-featured.webp
 ---
 
 One of the biggest problems I have working in a big company is the amount of documentation, and the expectation that everyone has the time, energy, and mental bandwidth to go through *very detailed documents*.
