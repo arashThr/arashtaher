@@ -6,6 +6,7 @@ tags:
   - macos
 description: A short list of lesser-known MacOS apps that add real value day to day, from file search and PDF editing to speech-to-text, screen recording, and video tools.
 image: /images/1794172477477-featured.webp
+draft: true
 ---
 
 Here are some of the lesser known MacOS apps I'm using that bring huge value to my day to day life.
