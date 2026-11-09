@@ -2,10 +2,13 @@
 title: Backtrack permutation
 date: 2026-10-20T12:55:26.076Z
 tags:
-  - algorithm
-  - dsa
+  - backtracking
+  - algorithms
   - python
-  - math
+  - permutations
+  - subsets
+description: "Two classic problems solved with backtracking: generating all permutations and finding every subset, with short Python implementations."
+image: /images/1794236785499-featured.webp
 ---
 
 Here are two of my favorite algorithm problems solved with backtracking: Finding permutations and all subsets.
